@@ -7,3 +7,4 @@ joblib
 supabase
 python-multipart
 fpdf2
+reportlab
