@@ -1,6 +1,8 @@
-streamlit
+fastapi
+uvicorn
 pandas
+numpy
 scikit-learn
 joblib
-numpy
-plotly
+supabase
+python-multipart
