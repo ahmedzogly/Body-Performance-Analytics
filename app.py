@@ -267,15 +267,27 @@ def get_performance_insights(grade, jump_distance, age):
     
     return '\n'.join(insights)
 
-# --- 4. ENHANCED PDF REPORT GENERATOR ---
+# --- 4. ENHANCED PDF REPORT GENERATOR (FIXED FOR UNICODE) ---
 class TitanPDF(FPDF):
+    def __init__(self):
+        super().__init__()
+        # استخدام خط يدعم العربية والرموز التعبيرية
+        # تحميل خط DejaVu الذي يدعم Unicode
+        try:
+            # محاولة تحميل خط DejaVu (يتوفر في معظم البيئات)
+            self.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
+            self.add_font('DejaVu', 'B', 'DejaVuSansCondensed-Bold.ttf', uni=True)
+            self.font_name = 'DejaVu'
+        except:
+            # إذا لم يتوفر، استخدام helvetica مع إزالة الرموز التعبيرية
+            self.font_name = 'helvetica'
+    
     def header(self):
         if self.page_no() == 1:
-            # Header with Logo
-            self.set_font('helvetica', 'B', 24)
+            self.set_font(self.font_name, 'B', 20)
             self.set_text_color(0, 98, 255)
             self.cell(0, 15, 'TITAN PERFORMANCE ANALYTICS', ln=True, align='C')
-            self.set_font('helvetica', 'I', 10)
+            self.set_font(self.font_name, 'I', 10)
             self.set_text_color(100, 100, 100)
             self.cell(0, 8, 'AI-Powered Body Performance Report', ln=True, align='C')
             self.line(10, 30, 200, 30)
@@ -283,80 +295,244 @@ class TitanPDF(FPDF):
 
     def footer(self):
         self.set_y(-20)
-        self.set_font('helvetica', 'I', 8)
+        self.set_font(self.font_name, 'I', 8)
         self.set_text_color(100, 100, 100)
         self.cell(0, 10, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', align='C')
         self.cell(0, 10, f'Page {self.page_no()}', align='R')
+
+def clean_text_for_pdf(text):
+    """Remove or replace emojis and special characters for PDF compatibility"""
+    import re
+    # Remove emojis and special symbols
+    emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001F900-\U0001F9FF"  # supplemental symbols
+        u"\U0001FA70-\U0001FAFF"  # more symbols
+        "]+", flags=re.UNICODE)
+    
+    cleaned = emoji_pattern.sub(r'', text)
+    # Replace common symbols
+    cleaned = cleaned.replace('🏆', 'CHAMPION')
+    cleaned = cleaned.replace('⚡', 'LIGHTNING')
+    cleaned = cleaned.replace('📊', 'DATA')
+    cleaned = cleaned.replace('🔬', 'LAB')
+    cleaned = cleaned.replace('🧬', 'DNA')
+    cleaned = cleaned.replace('🛰️', 'SATELLITE')
+    cleaned = cleaned.replace('📈', 'TREND')
+    cleaned = cleaned.replace('📚', 'LIBRARY')
+    cleaned = cleaned.replace('💪', 'STRENGTH')
+    cleaned = cleaned.replace('🧘', 'FLEX')
+    cleaned = cleaned.replace('🏋️', 'TRAINING')
+    cleaned = cleaned.replace('❤️', 'HEART')
+    cleaned = cleaned.replace('💙', 'BP')
+    cleaned = cleaned.replace('📅', 'AGE')
+    cleaned = cleaned.replace('📏', 'HEIGHT')
+    cleaned = cleaned.replace('⚖️', 'WEIGHT')
+    cleaned = cleaned.replace('💧', 'FAT')
+    cleaned = cleaned.replace('🥗', 'NUTRITION')
+    cleaned = cleaned.replace('🏃‍♂️', 'RUN')
+    cleaned = cleaned.replace('🦵', 'LEG')
+    cleaned = cleaned.replace('🛡️', 'PROTECTION')
+    cleaned = cleaned.replace('🎯', 'GOAL')
+    cleaned = cleaned.replace('🌱', 'START')
+    cleaned = cleaned.replace('📊', 'DATA')
+    cleaned = cleaned.replace('🎉', 'SUCCESS')
+    
+    return cleaned.strip()
 
 def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     pdf = TitanPDF()
     pdf.add_page()
     
+    # Clean text for PDF compatibility
+    clean_name = clean_text_for_pdf(name)
+    clean_recs = clean_text_for_pdf(recs)
+    
     # Athlete Information Section
-    pdf.set_font('helvetica', 'B', 14)
+    pdf.set_font(pdf.font_name, 'B', 14)
     pdf.set_text_color(0, 98, 255)
     pdf.cell(0, 10, 'ATHLETE INFORMATION', ln=True)
-    pdf.set_font('helvetica', '', 11)
+    pdf.set_font(pdf.font_name, '', 11)
     pdf.set_text_color(0, 0, 0)
     
     info_data = [
-        ['Athlete Name', name],
+        ['Athlete Name', clean_name if clean_name else 'Anonymous'],
         ['Age', str(age)],
         ['Gender', gender],
         ['Assessment Date', datetime.now().strftime('%Y-%m-%d %H:%M')]
     ]
     
     for label, value in info_data:
-        pdf.set_font('helvetica', 'B', 11)
+        pdf.set_font(pdf.font_name, 'B', 11)
         pdf.cell(50, 8, label + ':', ln=False)
-        pdf.set_font('helvetica', '', 11)
-        pdf.cell(0, 8, value, ln=True)
+        pdf.set_font(pdf.font_name, '', 11)
+        pdf.cell(0, 8, str(value), ln=True)
     
     pdf.ln(10)
     
     # Performance Results
-    pdf.set_font('helvetica', 'B', 14)
+    pdf.set_font(pdf.font_name, 'B', 14)
     pdf.set_text_color(0, 98, 255)
     pdf.cell(0, 10, 'PERFORMANCE METRICS', ln=True)
     pdf.set_fill_color(240, 240, 240)
     
     # Metrics Table
-    pdf.set_font('helvetica', 'B', 11)
+    pdf.set_font(pdf.font_name, 'B', 11)
     pdf.cell(100, 10, 'Metric', 1, 0, 'C', True)
     pdf.cell(0, 10, 'Value', 1, 1, 'C', True)
     
-    pdf.set_font('helvetica', '', 11)
+    pdf.set_font(pdf.font_name, '', 11)
     for metric, value in metrics_dict.items():
-        pdf.cell(100, 8, metric, 1)
-        pdf.cell(0, 8, str(value), 1, 1)
+        clean_metric = clean_text_for_pdf(metric)
+        clean_value = clean_text_for_pdf(str(value))
+        pdf.cell(100, 8, clean_metric, 1)
+        pdf.cell(0, 8, clean_value, 1, 1)
     
     pdf.ln(10)
     
     # Analysis Results
-    pdf.set_font('helvetica', 'B', 12)
+    pdf.set_font(pdf.font_name, 'B', 12)
     pdf.cell(0, 10, 'AI ANALYSIS RESULTS:', ln=True)
-    pdf.set_font('helvetica', '', 11)
+    pdf.set_font(pdf.font_name, '', 11)
     pdf.cell(0, 10, f'Performance Grade: CLASS {p_class}', ln=True)
     pdf.cell(0, 10, f'Predicted Jump Distance: {p_jump:.2f} cm', ln=True)
     
     pdf.ln(10)
     
     # Recommendations
-    pdf.set_font('helvetica', 'B', 12)
+    pdf.set_font(pdf.font_name, 'B', 12)
     pdf.cell(0, 10, 'SYSTEM RECOMMENDATIONS:', ln=True)
-    pdf.set_font('helvetica', '', 11)
-    pdf.multi_cell(0, 8, recs)
+    pdf.set_font(pdf.font_name, '', 11)
+    
+    # Split recommendations into lines and clean each line
+    rec_lines = clean_recs.split('\n')
+    for line in rec_lines:
+        if line.strip():
+            clean_line = clean_text_for_pdf(line)
+            pdf.multi_cell(0, 6, clean_line)
     
     # Performance Insights
     pdf.ln(5)
-    pdf.set_font('helvetica', 'B', 11)
+    pdf.set_font(pdf.font_name, 'B', 11)
     pdf.cell(0, 10, 'PERFORMANCE INSIGHTS:', ln=True)
-    pdf.set_font('helvetica', 'I', 10)
+    pdf.set_font(pdf.font_name, 'I', 10)
     
     insights = get_performance_insights(p_class, p_jump, age)
-    pdf.multi_cell(0, 6, insights)
+    clean_insights = clean_text_for_pdf(insights)
+    insight_lines = clean_insights.split('\n')
+    for line in insight_lines:
+        if line.strip():
+            pdf.multi_cell(0, 6, line)
     
     return pdf.output()
+
+# --- ALTERNATIVE: Using fpdf2 with built-in Unicode support ---
+# إذا كنت تفضل استخدام نسخة أبسط مع دعم Unicode أفضل، يمكنك استخدام هذا الإصدار:
+
+def create_pdf_simple(name, age, gender, p_class, p_jump, recs, metrics_dict):
+    """Simpler PDF generation using reportlab (better Unicode support)"""
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        import io
+        
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=72)
+        styles = getSampleStyleSheet()
+        
+        # Create custom style
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#0062ff'),
+            alignment=1  # Center alignment
+        )
+        
+        story = []
+        
+        # Title
+        story.append(Paragraph("TITAN PERFORMANCE ANALYTICS", title_style))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph("AI-Powered Body Performance Report", styles['Italic']))
+        story.append(Spacer(1, 20))
+        
+        # Athlete Information
+        story.append(Paragraph("ATHLETE INFORMATION", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        
+        info_data = [
+            ['Athlete Name:', name],
+            ['Age:', str(age)],
+            ['Gender:', gender],
+            ['Assessment Date:', datetime.now().strftime('%Y-%m-%d %H:%M')]
+        ]
+        
+        info_table = Table(info_data, colWidths=[120, 300])
+        info_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
+        ]))
+        story.append(info_table)
+        story.append(Spacer(1, 20))
+        
+        # Performance Metrics
+        story.append(Paragraph("PERFORMANCE METRICS", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        
+        metrics_list = [[metric, value] for metric, value in metrics_dict.items()]
+        metrics_table = Table(metrics_list, colWidths=[200, 200])
+        metrics_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+        ]))
+        story.append(metrics_table)
+        story.append(Spacer(1, 20))
+        
+        # Analysis Results
+        story.append(Paragraph("AI ANALYSIS RESULTS", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(f"Performance Grade: CLASS {p_class}", styles['Normal']))
+        story.append(Paragraph(f"Predicted Jump Distance: {p_jump:.2f} cm", styles['Normal']))
+        story.append(Spacer(1, 20))
+        
+        # Recommendations
+        story.append(Paragraph("SYSTEM RECOMMENDATIONS", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        # Clean recommendations of emojis
+        clean_recs = clean_text_for_pdf(recs)
+        for line in clean_recs.split('\n'):
+            if line.strip():
+                story.append(Paragraph(line, styles['Normal']))
+        
+        story.append(Spacer(1, 20))
+        
+        # Build PDF
+        doc.build(story)
+        buffer.seek(0)
+        return buffer.getvalue()
+        
+    except ImportError:
+        # Fallback to fpdf
+        st.warning("ReportLab not installed, using basic PDF. Install with: pip install reportlab")
+        return create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict)
 
 # --- 5. MODEL LOADING WITH VERSION CHECK ---
 @st.cache_resource
