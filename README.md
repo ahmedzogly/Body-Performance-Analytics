@@ -16,7 +16,7 @@ The "Body Performance" project follows the complete Data Science lifecycle to so
 ### Key Highlights
 * **Dataset:** 13,392 records with 12 physiological and performance features.
 * **Best Classifier:** Neural Network (MLP) achieving **74.65% accuracy**.
-* **Best Regressor:** Linear Regression achieving an **$R^{2}$ score of 0.79**.
+* **Best Regressor:** Linear Regression achieving an **R² score of 0.79**.
 * **Deployment:** Live interactive dashboard built with **Streamlit**.
 
 ---
@@ -37,6 +37,8 @@ We compared several models including SVM, Random Forest, Naive Bayes, and Neural
 * **Classification:** The **MLP (128, 64 nodes)** outperformed others by effectively capturing non-linear relationships in the biometric data.
 * **Regression:** While SVR performed well, **Linear Regression** was chosen for deployment due to its high interpretability—allowing coaches to see exactly how much each feature impacts performance.
 
+![licensed-image](https://github.com/user-attachments/assets/1cd7058c-cf77-4f7e-ad13-e1bb2d3d6a5a)
+
 ---
 
 ## 🚀 Installation & Local Usage
@@ -50,27 +52,27 @@ We compared several models including SVM, Random Forest, Naive Bayes, and Neural
    ```bash
    git clone [https://github.com/YourUsername/Body-Performance-Analytics.git](https://github.com/YourUsername/Body-Performance-Analytics.git)
    cd Body-Performance-Analytics
+2 Install dependencies:
 
-
-Install dependencies:
 Bash
 pip install -r requirements.txt
 
 
-Run the Streamlit App:
+3-Run the Streamlit App:
+
 Bash
 streamlit run app.py
 
-
 🛠️ Tech Stack
 Language: Python
+
 Data Libraries: Pandas, NumPy, Matplotlib, Seaborn
+
 ML Libraries: Scikit-Learn, Joblib
+
 Deployment: Streamlit Cloud
+
 📂 Repository Structure
-
-Plaintext
-
 
 ├── data/                    # Raw and cleaned datasets
 ├── notebooks/               # Jupyter notebooks (EDA & Modeling)
@@ -84,12 +86,14 @@ Plaintext
 
 👨‍💻 Team Members
 Ahmed Shehta Zoghli
+
 Eslam TagElsir
+
 Osama Mohamed
+
 Mohamed Hassan
+
 Ahmed Ibrahim
+
 This project was developed as part of the Introduction to AI and ML Course | March 2026
 
-
-
-بعد رفع هذا الملف، سيتحول مستودعك على GitHub إلى واجهة احترافية تعرض مهاراتك بشكل ممتاز. هل تود أن أقوم بصياغة **منشور LinkedIn** احترافي لتعلن فيه عن نجاحك في إتمام هذا المشروع ونشره؟
