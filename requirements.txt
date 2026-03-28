@@ -10,3 +10,7 @@ fpdf2
 reportlab
 fpdf
 chardet
+streamlit
+plotly
+openpyxl
+xlrd
