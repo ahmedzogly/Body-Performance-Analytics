@@ -9,3 +9,4 @@ python-multipart
 fpdf2
 reportlab
 fpdf
+chardet
