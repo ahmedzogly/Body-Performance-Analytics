@@ -13,6 +13,7 @@ import hashlib
 import os
 from pathlib import Path
 import re
+import io
 
 # --- 1. SYSTEM CONFIGURATION ---
 st.set_page_config(
@@ -462,7 +463,7 @@ def get_performance_insights(grade, jump_distance, age):
     
     return '\n'.join(insights)
 
-# --- 5. PDF GENERATOR WITH UNICODE SUPPORT ---
+# --- 5. PDF GENERATOR WITH FIXED BYTE CONVERSION ---
 class TitanPDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -488,6 +489,7 @@ class TitanPDF(FPDF):
         self.cell(0, 10, f'Page {self.page_no()}', align='R')
 
 def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
+    """Create PDF and return as bytes (fixed for Streamlit compatibility)"""
     pdf = TitanPDF()
     pdf.add_page()
     
@@ -571,7 +573,17 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
         if line.strip():
             pdf.multi_cell(0, 7, line[:85])
     
-    return pdf.output()
+    # Convert bytearray to bytes for Streamlit compatibility
+    pdf_output = pdf.output()
+    
+    # Check if output is bytearray and convert to bytes
+    if isinstance(pdf_output, bytearray):
+        return bytes(pdf_output)
+    elif isinstance(pdf_output, bytes):
+        return pdf_output
+    else:
+        # If it's a string, encode to bytes
+        return pdf_output.encode('latin-1') if isinstance(pdf_output, str) else bytes(pdf_output)
 
 # --- 6. MODEL LOADING WITH VERSION CHECK ---
 @st.cache_resource
@@ -750,7 +762,7 @@ with tab1:
                     with st.expander("💡 AI RECOMMENDATIONS", expanded=True):
                         st.markdown(rec_text)
                     
-                    # PDF Download
+                    # PDF Download - FIXED
                     try:
                         metrics_dict = {
                             'Performance Grade': f'Class {p_class}',
@@ -763,20 +775,34 @@ with tab1:
                         }
                         pdf_data = create_enhanced_pdf(user_name, age, gender_input, p_class, p_jump, rec_text, metrics_dict)
                         
-                        col_btn1, col_btn2 = st.columns(2)
-                        with col_btn1:
+                        # Verify pdf_data is bytes
+                        if isinstance(pdf_data, bytes):
+                            col_btn1, col_btn2 = st.columns(2)
+                            with col_btn1:
+                                st.download_button(
+                                    label="📥 DOWNLOAD PDF REPORT",
+                                    data=pdf_data,
+                                    file_name=f"BodyAI_Report_{user_name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    use_container_width=True
+                                )
+                            with col_btn2:
+                                if st.button("🔄 RESET ANALYSIS", use_container_width=True):
+                                    st.rerun()
+                        else:
+                            st.warning("PDF generated but format issue. Trying alternative method...")
+                            # Alternative: use BytesIO
+                            from io import BytesIO
+                            pdf_buffer = BytesIO(pdf_data if isinstance(pdf_data, bytes) else bytes(pdf_data))
                             st.download_button(
                                 label="📥 DOWNLOAD PDF REPORT",
-                                data=pdf_data,
-                                file_name=f"BodyAI_Report_{user_name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                data=pdf_buffer,
+                                file_name=f"BodyAI_Report_{user_name.replace(' ', '_')}.pdf",
                                 mime="application/pdf",
                                 use_container_width=True
                             )
-                        with col_btn2:
-                            if st.button("🔄 RESET ANALYSIS", use_container_width=True):
-                                st.rerun()
                     except Exception as e:
-                        st.warning(f"PDF Generation Note: {str(e)[:100]}")
+                        st.warning(f"PDF Note: {str(e)[:100]}")
                     
             except Exception as e:
                 st.error(f"Analysis Error: {str(e)[:200]}")
