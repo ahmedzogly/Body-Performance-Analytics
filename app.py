@@ -3,209 +3,144 @@ import pandas as pd
 import joblib
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 import time
+from fpdf import FPDF
+import base64
 
-# --- 1. إعدادات الصفحة والنمط التقني (Tech UI Configuration) ---
+# --- 1. إعدادات النظام المتقدمة ---
 st.set_page_config(
-    page_title="CORE-AI | Body Performance",
-    page_icon="📡",
+    page_title="TITAN-AI | Body Analytics",
+    page_icon="⚡",
     layout="wide"
 )
 
-# تصميم واجهة "Cyber-Tech" باستخدام CSS
+# تصميم الواجهة Tech Style (أحجام ضخمة وألوان نيون)
 st.markdown("""
     <style>
-    /* الخلفية العامة والخطوط */
-    .main {
-        background-color: #050505;
-        color: #00ff41; /* لون أخضر تقني (Matrix style) أو استبدله بـ #00d4ff للنمط الأزرق */
-        font-family: 'Courier New', Courier, monospace;
-    }
-    
-    /* الحاويات والبطاقات */
-    div.stButton > button:first-child {
-        background: linear-gradient(135deg, #00d4ff 0%, #004e92 100%);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        transition: 0.3s;
-        box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
-    }
-    
-    div.stButton > button:hover {
-        box-shadow: 0 0 25px rgba(0, 212, 255, 0.8);
-        transform: translateY(-2px);
-    }
-
-    .stMetric {
-        background-color: #0a192f;
-        border: 1px solid #00d4ff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.1);
-    }
-
-    /* تحسين شكل الـ Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-        background-color: #0a192f;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        color: #adbac7 !important;
-        font-weight: bold;
-    }
-
-    .stTabs [aria-selected="true"] {
-        color: #00d4ff !important;
-        border-bottom: 2px solid #00d4ff !important;
-    }
-
-    /* شريط التمرير والمدخلات */
-    .stSlider [data-baseweb="slider"] {
-        background-color: #00d4ff;
-    }
-    
-    /* تأثيرات النصوص التقنية */
+    .main { background-color: #020617; color: #00f2ff; font-family: 'Segoe UI', sans-serif; }
     .tech-header {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: -webkit-linear-gradient(#00d4ff, #004e92);
+        font-size: 4rem !important;
+        font-weight: 900;
+        background: linear-gradient(90deg, #00f2ff, #0062ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-transform: uppercase;
         letter-spacing: 5px;
+        text-align: center;
+        text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+    }
+    div[data-testid="stMetricValue"] { font-size: 75px !important; color: #00f2ff !important; }
+    .stButton > button {
+        width: 100% !important; height: 3.5em !important; font-size: 1.3rem !important;
+        background: linear-gradient(45deg, #00f2ff, #0062ff) !important;
+        border: none !important; color: white !important; font-weight: bold !important;
+        box-shadow: 0 0 15px rgba(0, 242, 255, 0.4) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. محرك تحميل البيانات (Engine Loading) ---
+# --- 2. وظيفة إنشاء تقرير PDF ---
+class PDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 15)
+        self.cell(0, 10, 'TITAN-AI: Body Performance Report', 0, 1, 'C')
+        self.ln(10)
+
+def create_pdf(name, age, gender, p_class, p_jump, recs):
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font('Arial', '', 12)
+    pdf.cell(0, 10, f"Name: {name}", 0, 1)
+    pdf.cell(0, 10, f"Age: {age} | Gender: {gender}", 0, 1)
+    pdf.ln(5)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(0, 10, f"Final Performance Grade: {p_class}", 0, 1)
+    pdf.cell(0, 10, f"Predicted Broad Jump: {p_jump:.2f} cm", 0, 1)
+    pdf.ln(10)
+    pdf.set_font('Arial', 'I', 11)
+    pdf.multi_cell(0, 10, f"System Recommendation: {recs}")
+    return pdf.output(dest='S').encode('latin-1')
+
+# --- 3. تحميل النماذج والبيانات ---
 @st.cache_resource
-def load_engine():
+def load_assets():
     clf = joblib.load('classifier_model.pkl')
     reg = joblib.load('regression_model.pkl')
     scaler = joblib.load('scaler.pkl')
-    # إحصائيات مرجعية للذكاء الاصطناعي
-    ref_stats = {
-        'age': 36.7, 'height_cm': 168.5, 'weight_kg': 67.4, 'body_fat_pct': 23.2,
-        'gripForce': 36.9, 'sit_bend_forward_cm': 15.2, 'sit_ups_counts': 39.7
-    }
-    return clf, reg, scaler, ref_stats
+    return clf, reg, scaler
 
-clf, reg, scaler, ref_stats = load_engine()
+clf, reg, scaler = load_assets()
 
-# --- 3. لوحة التحكم الجانبية (System Sidebar) ---
+# --- 4. واجهة التطبيق ---
+st.markdown("<h1 class='tech-header'>TITAN PERFORMANCE AI</h1>", unsafe_allow_html=True)
+
 with st.sidebar:
-    st.markdown("<h2 style='color:#00d4ff;'>SYSTEM TERMINAL</h2>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/689/689304.png", width=120)
+    st.markdown("<h2 style='color:#00f2ff;'>📡 COMMAND CENTER</h2>", unsafe_allow_html=True)
+    st.image("https://cdn-icons-png.flaticon.com/512/2097/2097276.png", width=120)
     st.divider()
-    
-    st.subheader("🛠️ DEV TEAM")
-    devs = ["A. Zoghli (Lead)", "E. TagElsir", "O. Mohamed", "M. Hassan", "A. Ibrahim"]
-    for d in devs:
-        st.code(f"USER: {d}")
-    
-    st.divider()
-    st.write("📡 STATUS: ONLINE")
-    st.write("🔒 SECURE CONNECTION")
+    st.subheader("👥 DEV TEAM")
+    for dev in ["A. Zoghli", "E. TagElsir", "O. Mohamed", "M. Hassan", "A. Ibrahim"]:
+        st.code(f"ID: {dev.split('.')[1].strip().upper()}")
 
-# --- 4. الواجهة الرئيسية (Main Interface) ---
-st.markdown("<h1 class='tech-header'>CORE-AI PERFORMANCE</h1>", unsafe_allow_html=True)
-st.write(">>> ANALYZING BIOMETRIC DATA STRREAMS...")
+# الجزء الرئيسي للتحليل
+col_in, col_out = st.columns([1, 1.2])
 
-t1, t2, t3 = st.tabs(["[ CORE ANALYSIS ]", "[ BULK PROCESSOR ]", "[ SYSTEM LOGS ]"])
-
-# --- TAB 1: التحليل الفردي (Individual Core) ---
-with t1:
-    col_input, col_output = st.columns([1, 1.2])
+with col_in:
+    st.markdown("### 🧬 BIOMETRIC SCANNER")
+    user_name = st.text_input("SUBJECT NAME", "Unknown Athlete")
+    age = st.slider("AGE", 10, 80, 25)
+    gender = st.selectbox("GENDER", ["ذكر", "أنثى"])
+    height = st.number_input("HEIGHT (CM)", 120.0, 220.0, 175.0)
+    weight = st.number_input("WEIGHT (KG)", 30.0, 150.0, 75.0)
+    fat = st.slider("BODY FAT %", 5.0, 50.0, 18.0)
     
-    with col_input:
-        st.subheader("INPUT DATA")
-        with st.container(border=True):
-            age = st.slider("AGE_VAR", 10, 80, 25)
-            gender = st.selectbox("GENDER_TYPE", ["ذكر", "أنثى"])
-            height = st.number_input("HEIGHT_CM", 120.0, 220.0, 175.0)
-            weight = st.number_input("WEIGHT_KG", 30.0, 150.0, 75.0)
-            fat = st.slider("BODY_FAT_%", 5.0, 50.0, 18.0)
-            
-            with st.expander("ADVANCED METRICS"):
-                grip = st.number_input("GRIP_FORCE", 0.0, 100.0, 45.0)
-                flex = st.number_input("FLEX_BEND", -20.0, 40.0, 15.0)
-                situps = st.number_input("SIT_UPS", 0, 100, 45)
-                sys = st.number_input("SYS_BP", 80, 200, 120)
-                dias = st.number_input("DIAS_BP", 40, 130, 80)
+    with st.expander("⚡ ADVANCED PERFORMANCE DATA"):
+        grip = st.number_input("GRIP STRENGTH", 0.0, 100.0, 45.0)
+        flex = st.number_input("FLEXIBILITY (BEND)", -20.0, 40.0, 15.0)
+        situps = st.number_input("CORE (SIT-UPS)", 0, 100, 45)
+        sys = st.number_input("SYSTOLIC BP", 80, 200, 120)
+        dias = st.number_input("DIASTOLIC BP", 40, 130, 80)
+
+    analyze = st.button("RUN CORE SCAN")
+
+if analyze:
+    with st.spinner("PROCESSING DATA STREAMS..."):
+        time.sleep(1)
+        g_val = 0 if gender == "ذكر" else 1
+        features = [age, g_val, height, weight, fat, dias, sys, grip, flex, situps]
+        input_df = pd.DataFrame([features], columns=['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'])
         
-        run_analysis = st.button("RUN SYSTEM ANALYSIS")
+        scaled = scaler.transform(input_df)
+        p_class = clf.predict(scaled)[0]
+        p_jump = reg.predict(scaled)[0]
 
-    if run_analysis:
-        with st.spinner("PROCESSING DATA STREAMS..."):
-            time.sleep(1)
-            # تجهيز البيانات
-            gender_val = 0 if gender == "ذكر" else 1
-            features = [age, gender_val, height, weight, fat, dias, sys, grip, flex, situps]
-            input_df = pd.DataFrame([features], columns=['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'])
+        with col_out:
+            st.markdown("### 🛰️ ANALYTICAL OUTPUT")
+            r1, r2 = st.columns(2)
+            r1.metric("GRADE", f"RANK_{p_class}")
+            r2.metric("POWER", f"{p_jump:.1f} CM")
             
-            scaled = scaler.transform(input_df)
-            pred_class = clf.predict(scaled)[0]
-            pred_jump = reg.predict(scaled)[0]
+            # توصية بسيطة للتقرير
+            rec_text = f"The subject is classified as Grade {p_class}. Focus on flexibility and core stability is recommended to enhance explosive power."
+            
+            st.info(f"💡 {rec_text}")
+            
+            # زر تحميل التتقرير
+            pdf_data = create_pdf(user_name, age, gender, p_class, p_jump, rec_text)
+            st.download_button(
+                label="📥 DOWNLOAD PERFORMANCE REPORT (PDF)",
+                data=pdf_data,
+                file_name=f"Report_{user_name}.pdf",
+                mime="application/pdf"
+            )
+            
+            # رسم بياني توضيحي
+            fig = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = p_jump,
+                title = {'text': "Explosive Power (Jump)"},
+                gauge = {'axis': {'range': [None, 300]}, 'bar': {'color': "#00f2ff"}}
+            ))
+            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff", height=300)
+            st.plotly_chart(fig, use_container_width=True)
 
-            with col_output:
-                st.subheader("OUTPUT RESULTS")
-                c1, c2 = st.columns(2)
-                c1.metric("GRADE_RANK", f"CLASS {pred_class}")
-                c2.metric("JUMP_PRED", f"{pred_jump:.1f} CM")
-                
-                # الرسم البياني التقني (Radar)
-                cat = ['Strength', 'Flex', 'Endurance', 'Mass_Idx', 'Fat_Idx']
-                user_v = [grip/70, (flex+20)/60, situps/80, 1-(weight/150), 1-(fat/50)]
-                ref_v = [ref_stats['gripForce']/70, (ref_stats['sit_bend_forward_cm']+20)/60, ref_stats['sit_ups_counts']/80, 1-(ref_stats['weight_kg']/150), 1-(ref_stats['body_fat_pct']/50)]
-
-                fig = go.Figure()
-                fig.add_trace(go.Scatterpolar(r=user_v, theta=cat, fill='toself', name='TARGET', line_color='#00d4ff'))
-                fig.add_trace(go.Scatterpolar(r=ref_v, theta=cat, fill='toself', name='BASELINE', line_color='#6e7681'))
-                fig.update_layout(polar=dict(radialaxis=dict(visible=False), bgcolor="#0a192f"), 
-                                  paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                                  font_color="#00d4ff", template="plotly_dark", height=350)
-                st.plotly_chart(fig, use_container_width=True)
-                
-                st.code(f"> RECOMMENDATION: Optimizing FAT_IDX by 5% will elevate GRADE_RANK to NEXT_LEVEL.")
-
-# --- TAB 2: معالجة الدفعات (Bulk Processor) ---
-with t2:
-    st.subheader("DATA BATCH UPLOAD")
-    file = st.file_uploader("UPLOAD SYSTEM FILE (XLSX/CSV)", type=['xlsx', 'csv'])
-    
-    if file:
-        df = pd.read_excel(file) if file.name.endswith('.xlsx') else pd.read_csv(file)
-        if st.button("EXECUTE BATCH PROCESSING"):
-            # منطق المعالجة...
-            st.success("BATCH COMPLETE. ANALYZING DISTRIBUTION...")
-            fig_hist = px.histogram(df, x=df.columns[-1], title="SYSTEM DISTRIBUTION", color_discrete_sequence=['#00d4ff'])
-            fig_hist.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#00d4ff")
-            st.plotly_chart(fig_hist)
-
-# --- TAB 3: سجلات النظام (System Logs) ---
-with t3:
-    st.subheader("SYSTEM ARCHITECTURE")
-    st.markdown("""
-    ```text
-    [MODEL_INFO]
-    - CLASSIFIER: MLP_NEURAL_NETWORK (Accuracy: 74.65%)
-    - REGRESSOR: LINEAR_REGRESSION (R2: 0.79)
-    - SCALER: MIN_MAX_SCALER
-    - DATASET: 13,392 RECORDS
-    
-    [LOGS]
-    - Connection established... OK
-    - Models loaded... OK
-    - Ready for inference.
-    ```
-    """)
-
-st.markdown("---")
-st.markdown("<p style='text-align: center; color: #444;'>// END OF TERMINAL // BODY PERFORMANCE AI © 2026</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #334155; margin-top: 50px;'>// TITAN CORE V4.0 // SECURE REPORTING ENABLED // 2026</p>", unsafe_allow_html=True)
