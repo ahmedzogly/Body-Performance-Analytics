@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import io
+import chardet  # Add this for encoding detection
 
 # --- 1. SYSTEM CONFIGURATION ---
 st.set_page_config(
@@ -578,23 +579,75 @@ def load_assets():
     
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. FILE PROCESSING FUNCTION (SUPPORTS BOTH EXCEL AND CSV) ---
+# --- 7. ENHANCED FILE PROCESSING FUNCTION WITH ENCODING DETECTION ---
+def detect_encoding(file_bytes):
+    """Detect file encoding using chardet"""
+    try:
+        result = chardet.detect(file_bytes)
+        encoding = result['encoding']
+        confidence = result['confidence']
+        return encoding, confidence
+    except:
+        return None, 0
+
 def process_uploaded_file(uploaded_file):
-    """Process uploaded file (Excel or CSV) and return DataFrame"""
+    """Process uploaded file (Excel or CSV) with encoding detection for CSV"""
     file_extension = uploaded_file.name.split('.')[-1].lower()
     
     try:
         if file_extension == 'csv':
-            df = pd.read_csv(uploaded_file)
-            st.success(f"✅ CSV file loaded successfully! Found {len(df)} records.")
+            # Read file bytes for encoding detection
+            file_bytes = uploaded_file.getvalue()
+            
+            # Detect encoding
+            encoding, confidence = detect_encoding(file_bytes)
+            
+            if encoding:
+                st.info(f"🔍 Detected encoding: {encoding} (confidence: {confidence:.2%})")
+                
+                # Try to read with detected encoding
+                try:
+                    # Convert bytes to string with detected encoding
+                    text_content = file_bytes.decode(encoding)
+                    # Use StringIO to read as CSV
+                    from io import StringIO
+                    df = pd.read_csv(StringIO(text_content))
+                    st.success(f"✅ CSV file loaded successfully with {encoding} encoding! Found {len(df)} records.")
+                    return df
+                except Exception as e:
+                    st.warning(f"Failed with detected encoding {encoding}. Trying fallback encodings...")
+            
+            # Fallback: Try multiple encodings
+            encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'cp1256', 'windows-1256', 'utf-16', 'utf-16le']
+            
+            for enc in encodings_to_try:
+                try:
+                    # Reset file pointer
+                    uploaded_file.seek(0)
+                    df = pd.read_csv(uploaded_file, encoding=enc)
+                    st.success(f"✅ CSV file loaded successfully with {enc} encoding! Found {len(df)} records.")
+                    return df
+                except:
+                    continue
+            
+            # If all encodings fail, try with error handling
+            try:
+                uploaded_file.seek(0)
+                df = pd.read_csv(uploaded_file, encoding='utf-8', errors='ignore')
+                st.warning("⚠️ Loaded with UTF-8 ignoring errors. Some characters may be missing.")
+                return df
+            except:
+                raise Exception("Could not read CSV file with any encoding")
+        
         elif file_extension in ['xlsx', 'xls']:
+            # For Excel files, no encoding issues
             df = pd.read_excel(uploaded_file)
             st.success(f"✅ Excel file loaded successfully! Found {len(df)} records.")
+            return df
         else:
             st.error(f"Unsupported file format: {file_extension}")
             return None
-        
-        return df
+            
     except Exception as e:
         st.error(f"Error reading file: {str(e)}")
         return None
@@ -615,13 +668,17 @@ def analyze_batch_data(df, scaler, clf, reg):
                 if col in row:
                     val = row[col]
                     # Handle gender (convert M/F to 0/1 if needed)
-                    if col == 'gender' and isinstance(val, str):
-                        val = 0 if val.upper() in ['M', 'MALE', 'MALE'] else 1
+                    if col == 'gender':
+                        if isinstance(val, str):
+                            val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
+                        elif isinstance(val, (int, float)):
+                            # Already numeric, keep as is
+                            pass
                     features.append(float(val) if pd.notna(val) else 0)
                 else:
                     features.append(0)
             
-            input_df = pd.DataFrame([features], columns=feature_names)
+            input_df = pd.DataFrame([features[:10]], columns=feature_names)
             scaled_data = scaler.transform(input_df)
             p_class = clf.predict(scaled_data)[0]
             p_jump = reg.predict(scaled_data)[0]
@@ -796,7 +853,7 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (SUPPORTS EXCEL AND CSV) ---
+# --- TAB 2: BATCH ANALYSIS (SUPPORTS EXCEL AND CSV WITH ENCODING DETECTION) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
@@ -810,7 +867,7 @@ with tab2:
     )
     
     if uploaded_file is not None:
-        # Process the uploaded file
+        # Process the uploaded file with enhanced encoding detection
         df = process_uploaded_file(uploaded_file)
         
         if df is not None:
@@ -855,8 +912,12 @@ with tab2:
                                     if col in row:
                                         val = row[col]
                                         # Handle gender (convert M/F to 0/1 if needed)
-                                        if col == 'gender' and isinstance(val, str):
-                                            val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
+                                        if col == 'gender':
+                                            if isinstance(val, str):
+                                                val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
+                                            elif isinstance(val, (int, float)):
+                                                # Already numeric, keep as is
+                                                pass
                                         features.append(float(val) if pd.notna(val) else 0)
                                     else:
                                         features.append(0)
@@ -966,8 +1027,8 @@ with tab2:
                             df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
                             df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
                             
-                            # Save as CSV
-                            df_with_predictions.to_csv(output, index=False)
+                            # Save as CSV with UTF-8 encoding
+                            df_with_predictions.to_csv(output, index=False, encoding='utf-8')
                             mime_type = "text/csv"
                             output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
                         else:
@@ -1015,7 +1076,7 @@ with tab2:
             """)
             
             # Example data for CSV
-            st.markdown("### CSV Example:")
+            st.markdown("### CSV Example (UTF-8):")
             st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
 25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
 30,1,165.3,65.4,22.0,75,115,38.2,12.5,38
@@ -1023,6 +1084,8 @@ with tab2:
             
             st.markdown("### Excel Example:")
             st.markdown("Create an Excel file with the same column structure as shown above.")
+            
+            st.info("💡 **Tip for CSV files:** The system automatically detects file encoding (UTF-8, Latin-1, Windows-1256, etc.)")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1179,7 +1242,7 @@ with tab5:
 # --- 11. FOOTER ---
 st.markdown("""
 <div class='footer'>
-    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis (CSV/Excel)</p>
+    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis (CSV/Excel with Auto-Encoding)</p>
     <p>© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
     <p>Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
 </div>
