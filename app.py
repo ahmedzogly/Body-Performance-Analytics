@@ -22,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. ENHANCED CSS WITH LARGER FONTS ---
+# --- 2. ENHANCED CSS WITH EVEN LARGER FONTS (INCREASED BY 5 POINTS) ---
 st.markdown("""
     <style>
     /* Main Background with Gradient Animation */
@@ -32,9 +32,9 @@ st.markdown("""
         font-family: 'Segoe UI', 'Roboto', sans-serif;
     }
     
-    /* Animated Gradient Text - LARGER */
+    /* Animated Gradient Text - EVEN LARGER */
     .tech-header {
-        font-size: 5rem !important;
+        font-size: 5.5rem !important;
         font-weight: 900;
         background: linear-gradient(90deg, #00f2ff, #0062ff, #00f2ff);
         background-size: 200% auto;
@@ -53,7 +53,7 @@ st.markdown("""
     
     /* Subheader Styling - LARGER */
     .tech-subheader {
-        font-size: 1.8rem !important;
+        font-size: 2.2rem !important;
         font-weight: 600;
         color: #00f2ff;
         text-align: center;
@@ -67,7 +67,7 @@ st.markdown("""
         background: rgba(15, 23, 42, 0.7);
         backdrop-filter: blur(10px);
         border-radius: 20px;
-        padding: 25px;
+        padding: 28px;
         border: 1px solid rgba(0, 242, 255, 0.3);
         box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
         transition: all 0.3s ease;
@@ -79,29 +79,29 @@ st.markdown("""
         border-color: rgba(0, 242, 255, 0.6);
     }
     
-    /* Metrics Styling - LARGER */
+    /* Metrics Styling - EVEN LARGER */
     div[data-testid="stMetricValue"] { 
-        font-size: 85px !important; 
+        font-size: 95px !important; 
         color: #00f2ff !important;
         text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
         font-weight: 800 !important;
     }
     
     div[data-testid="stMetricLabel"] {
-        font-size: 20px !important;
+        font-size: 24px !important;
         color: #94a3b8 !important;
         font-weight: 600 !important;
     }
     
     div[data-testid="stMetricDelta"] {
-        font-size: 16px !important;
+        font-size: 20px !important;
     }
     
     /* Button Styling - LARGER */
     .stButton > button {
         width: 100% !important;
-        height: 3.8em !important;
-        font-size: 1.4rem !important;
+        height: 4.2em !important;
+        font-size: 1.8rem !important;
         font-weight: bold !important;
         background: linear-gradient(45deg, #00f2ff, #0062ff) !important;
         border: none !important;
@@ -124,7 +124,7 @@ st.markdown("""
     }
     
     .stExpander summary {
-        font-size: 1.2rem !important;
+        font-size: 1.6rem !important;
         font-weight: 600 !important;
     }
     
@@ -134,12 +134,12 @@ st.markdown("""
         border: 1px solid #1e293b !important;
         color: #00f2ff !important;
         border-radius: 10px !important;
-        font-size: 1.1rem !important;
-        padding: 12px !important;
+        font-size: 1.5rem !important;
+        padding: 14px !important;
     }
     
     .stNumberInput label, .stTextInput label {
-        font-size: 1.1rem !important;
+        font-size: 1.5rem !important;
         font-weight: 600 !important;
         color: #94a3b8 !important;
     }
@@ -150,30 +150,30 @@ st.markdown("""
     }
     
     .stSlider label {
-        font-size: 1.1rem !important;
+        font-size: 1.5rem !important;
         font-weight: 600 !important;
     }
     
     /* Tabs Styling - LARGER */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 30px;
+        gap: 35px;
         background-color: rgba(15, 23, 42, 0.5);
         border-radius: 12px;
-        padding: 8px;
+        padding: 10px;
     }
     
     .stTabs [data-baseweb="tab"] {
         border-radius: 10px;
-        padding: 12px 24px;
+        padding: 15px 28px;
         font-weight: bold;
-        font-size: 1.1rem !important;
+        font-size: 1.5rem !important;
         color: #94a3b8;
     }
     
     .stTabs [aria-selected="true"] {
         background: linear-gradient(45deg, #00f2ff, #0062ff);
         color: white !important;
-        font-size: 1.1rem !important;
+        font-size: 1.5rem !important;
     }
     
     /* Sidebar Styling - LARGER FONTS */
@@ -183,79 +183,123 @@ st.markdown("""
     }
     
     .css-1d391kg .stMarkdown {
-        font-size: 1rem !important;
+        font-size: 1.2rem !important;
     }
     
     /* Headers in Sidebar */
     .css-1d391kg h2 {
-        font-size: 1.5rem !important;
+        font-size: 1.8rem !important;
         font-weight: 700 !important;
+    }
+    
+    .css-1d391kg h3 {
+        font-size: 1.5rem !important;
     }
     
     /* Success/Warning/Error Messages - LARGER */
     .stAlert {
         background-color: rgba(15, 23, 42, 0.9) !important;
         border-left: 5px solid #00f2ff !important;
-        font-size: 1.1rem !important;
+        font-size: 1.4rem !important;
     }
     
     /* Info Box Styling */
     .stInfo {
-        font-size: 1.1rem !important;
+        font-size: 1.4rem !important;
     }
     
     /* Dataframe Styling - LARGER */
     .stDataFrame {
-        font-size: 1rem !important;
+        font-size: 1.2rem !important;
+    }
+    
+    .stDataFrame table {
+        font-size: 1.2rem !important;
+    }
+    
+    /* Markdown Text */
+    .stMarkdown {
+        font-size: 1.2rem !important;
+    }
+    
+    /* Selectbox Styling */
+    .stSelectbox label {
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .stSelectbox div {
+        font-size: 1.3rem !important;
     }
     
     /* Footer */
     .footer {
         text-align: center;
-        padding: 25px;
+        padding: 28px;
         color: #334155;
         border-top: 1px solid rgba(0, 242, 255, 0.2);
         margin-top: 50px;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
     }
     
     /* Custom Metric Card */
     .metric-card {
         background: rgba(15, 23, 42, 0.8);
         border-radius: 15px;
-        padding: 20px;
+        padding: 22px;
         text-align: center;
         border: 1px solid rgba(0, 242, 255, 0.2);
     }
     
     .metric-card h3 {
-        font-size: 1.2rem;
+        font-size: 1.6rem;
         color: #94a3b8;
         margin-bottom: 10px;
     }
     
     .metric-card .value {
-        font-size: 2.5rem;
+        font-size: 3rem;
         font-weight: bold;
         color: #00f2ff;
     }
     
     /* Section Headers */
     .section-header {
-        font-size: 1.8rem !important;
+        font-size: 2.2rem !important;
         font-weight: 700 !important;
         color: #00f2ff !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 25px !important;
         border-left: 4px solid #00f2ff;
-        padding-left: 15px;
+        padding-left: 18px;
+    }
+    
+    /* Radio Buttons */
+    .stRadio label {
+        font-size: 1.4rem !important;
+    }
+    
+    /* Checkbox */
+    .stCheckbox label {
+        font-size: 1.4rem !important;
+    }
+    
+    /* Code Blocks */
+    .stCode {
+        font-size: 1.2rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. HELPER FUNCTIONS (DEFINED FIRST) ---
+# --- 3. IMPROVED TEXT CLEANING FOR PDF (FIXES UNICODE ISSUE) ---
 def clean_text_for_pdf(text):
-    """Remove or replace emojis and special characters for PDF compatibility"""
-    # Remove emojis and special symbols
+    """Remove or replace all special characters and emojis for PDF compatibility"""
+    if not text:
+        return ""
+    
+    # First, remove zero-width joiners and other invisible characters
+    text = re.sub(r'[\u200B-\u200D\uFEFF]', '', text)
+    
+    # Remove emojis and special symbols (comprehensive pattern)
     emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -265,24 +309,37 @@ def clean_text_for_pdf(text):
         u"\U000024C2-\U0001F251"
         u"\U0001F900-\U0001F9FF"  # supplemental symbols
         u"\U0001FA70-\U0001FAFF"  # more symbols
+        u"\U00002500-\U00002BEF"  # misc symbols
+        u"\U0000FE00-\U0000FE0F"  # variation selectors
+        u"\U0001F000-\U0001F02F"  # Mahjong tiles
+        u"\U0001F0A0-\U0001F0FF"  # playing cards
         "]+", flags=re.UNICODE)
     
     cleaned = emoji_pattern.sub(r'', text)
-    # Replace common symbols
+    
+    # Replace common symbols with text
     replacements = {
         '🏆': 'CHAMPION', '⚡': 'POWER', '📊': 'DATA', '🔬': 'LAB', '🧬': 'DNA',
         '🛰️': 'SATELLITE', '📈': 'TREND', '📚': 'LIBRARY', '💪': 'STRENGTH',
         '🧘': 'FLEX', '🏋️': 'TRAINING', '❤️': 'HEART', '💙': 'BP', '📅': 'AGE',
         '📏': 'HEIGHT', '⚖️': 'WEIGHT', '💧': 'FAT', '🥗': 'NUTRITION',
         '🏃‍♂️': 'RUN', '🦵': 'LEG', '🛡️': 'PROTECTION', '🎯': 'GOAL', '🌱': 'START',
-        '🎉': 'SUCCESS', '📝': 'NOTE', '🔍': 'SEARCH', '💡': 'TIP'
+        '🎉': 'SUCCESS', '📝': 'NOTE', '🔍': 'SEARCH', '💡': 'TIP', '🚀': 'LAUNCH',
+        '🔄': 'RESET', '📥': 'DOWNLOAD', '🧠': 'BRAIN', '🏷️': 'TAG', '⚥': 'GENDER'
     }
     
     for emoji, replacement in replacements.items():
         cleaned = cleaned.replace(emoji, replacement)
     
-    return cleaned.strip()
+    # Remove any remaining non-ASCII characters (keep only basic Latin)
+    cleaned = re.sub(r'[^\x00-\x7F]+', ' ', cleaned)
+    
+    # Clean up extra spaces
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    return cleaned if cleaned else "Information"
 
+# --- 4. HELPER FUNCTIONS (DEFINED FIRST) ---
 def get_percentile(grade):
     percentiles = {'A': 'Top 15%', 'B': 'Top 35%', 'C': 'Average (50-70%)', 'D': 'Bottom 20%'}
     return percentiles.get(grade, 'Average')
@@ -327,48 +384,48 @@ def generate_recommendations(grade, jump, age, bmi, fat):
     recommendations = []
     
     if grade == 'A':
-        recommendations.append("🏆 ELITE PERFORMER: Maintain current training intensity with focus on injury prevention.")
-        recommendations.append("⚡ Optimize explosive power with advanced plyometric drills (box jumps, depth jumps).")
-        recommendations.append("🎯 Set competitive goals: aim to exceed personal records in vertical jump.")
-        recommendations.append("📊 Schedule regular performance assessments to track progress.")
+        recommendations.append("ELITE PERFORMER: Maintain current training intensity with focus on injury prevention.")
+        recommendations.append("Optimize explosive power with advanced plyometric drills (box jumps, depth jumps).")
+        recommendations.append("Set competitive goals: aim to exceed personal records in vertical jump.")
+        recommendations.append("Schedule regular performance assessments to track progress.")
     elif grade == 'B':
-        recommendations.append("📈 STRONG FOUNDATION: Increase training intensity by 10-15% gradually.")
-        recommendations.append("💪 Focus on compound movements (squats, deadlifts) to enhance explosive power.")
-        recommendations.append("🧘 Add 15 minutes of dynamic stretching pre-workout.")
-        recommendations.append("🎯 Target: Reach Class A within 3-6 months with consistent training.")
+        recommendations.append("STRONG FOUNDATION: Increase training intensity by 10-15% gradually.")
+        recommendations.append("Focus on compound movements (squats, deadlifts) to enhance explosive power.")
+        recommendations.append("Add 15 minutes of dynamic stretching pre-workout.")
+        recommendations.append("Target: Reach Class A within 3-6 months with consistent training.")
     else:
-        recommendations.append("🌱 DEVELOPMENT FOCUS: Begin with bodyweight exercises to build foundation.")
-        recommendations.append("🏃‍♂️ Incorporate 30 minutes of cardio, 3 times weekly for endurance.")
-        recommendations.append("📅 Consistency is key - aim for 4 training sessions weekly.")
-        recommendations.append("💪 Focus on basic strength exercises before advancing to complex movements.")
+        recommendations.append("DEVELOPMENT FOCUS: Begin with bodyweight exercises to build foundation.")
+        recommendations.append("Incorporate 30 minutes of cardio, 3 times weekly for endurance.")
+        recommendations.append("Consistency is key - aim for 4 training sessions weekly.")
+        recommendations.append("Focus on basic strength exercises before advancing to complex movements.")
     
     # BMI-specific recommendations
     if bmi > 25:
-        recommendations.append("⚖️ WEIGHT MANAGEMENT: Focus on caloric deficit of 300-500 calories/day.")
-        recommendations.append("🥗 Increase protein intake while reducing processed carbohydrates.")
+        recommendations.append("WEIGHT MANAGEMENT: Focus on caloric deficit of 300-500 calories/day.")
+        recommendations.append("Increase protein intake while reducing processed carbohydrates.")
     elif bmi < 18.5:
-        recommendations.append("🍽️ NUTRITION FOCUS: Increase caloric intake with nutrient-dense foods.")
-        recommendations.append("💪 Combine strength training with increased protein consumption.")
+        recommendations.append("NUTRITION FOCUS: Increase caloric intake with nutrient-dense foods.")
+        recommendations.append("Combine strength training with increased protein consumption.")
     
     # Age-specific recommendations
     if age > 45:
-        recommendations.append("🛡️ INJURY PREVENTION: Include 20 minutes of mobility work before each session.")
-        recommendations.append("🧘 Focus on joint health and flexibility exercises.")
+        recommendations.append("INJURY PREVENTION: Include 20 minutes of mobility work before each session.")
+        recommendations.append("Focus on joint health and flexibility exercises.")
     elif age < 25:
-        recommendations.append("⚡ OPTIMAL DEVELOPMENT PHASE: Focus on building maximum strength and power.")
+        recommendations.append("OPTIMAL DEVELOPMENT PHASE: Focus on building maximum strength and power.")
     
     # Jump-specific recommendations
     if jump < 150:
-        recommendations.append("🦵 POWER DEVELOPMENT: Start with box squats and calf raises to build leg strength.")
-        recommendations.append("🏋️ Incorporate plyometric exercises: jump squats, lunges, and box jumps.")
+        recommendations.append("POWER DEVELOPMENT: Start with box squats and calf raises to build leg strength.")
+        recommendations.append("Incorporate plyometric exercises: jump squats, lunges, and box jumps.")
     elif jump > 220:
-        recommendations.append("🚀 EXCEPTIONAL POWER: Maintain with advanced plyometric training.")
+        recommendations.append("EXCEPTIONAL POWER: Maintain with advanced plyometric training.")
     
     # Fat percentage recommendations
     if fat > 25:
-        recommendations.append("🔥 BODY COMPOSITION: Focus on high-intensity interval training (HIIT).")
+        recommendations.append("BODY COMPOSITION: Focus on high-intensity interval training (HIIT).")
     elif fat < 10 and age > 30:
-        recommendations.append("⚠️ Monitor body fat levels; very low levels may impact hormone balance.")
+        recommendations.append("Monitor body fat levels; very low levels may impact hormone balance.")
     
     return "\n".join(recommendations)
 
@@ -383,59 +440,49 @@ def get_performance_insights(grade, jump_distance, age):
         'C': 'Intermediate Level. Good baseline with potential for significant improvement.',
         'D': 'Development Level. Focus on fundamental fitness components is recommended.'
     }
-    insights.append(f"• {grade_insights.get(grade, 'Standard performance level')}")
+    insights.append(f"- {grade_insights.get(grade, 'Standard performance level')}")
     
     # Jump distance analysis
     if jump_distance > 250:
-        insights.append(f"• Exceptional explosive power! Jump distance ({jump_distance:.1f}cm) exceeds elite athlete standards.")
+        insights.append(f"- Exceptional explosive power! Jump distance ({jump_distance:.1f}cm) exceeds elite athlete standards.")
     elif jump_distance > 200:
-        insights.append(f"• Excellent explosive power. Jump distance ({jump_distance:.1f}cm) indicates strong lower body strength.")
+        insights.append(f"- Excellent explosive power. Jump distance ({jump_distance:.1f}cm) indicates strong lower body strength.")
     elif jump_distance > 150:
-        insights.append(f"• Good explosive power. Focus on plyometric training could enhance jump performance.")
+        insights.append(f"- Good explosive power. Focus on plyometric training could enhance jump performance.")
     else:
-        insights.append(f"• Jump distance ({jump_distance:.1f}cm) suggests need for focused lower body strength training.")
+        insights.append(f"- Jump distance ({jump_distance:.1f}cm) suggests need for focused lower body strength training.")
     
     # Age-adjusted analysis
     if age < 30:
-        insights.append("• Optimal age range for peak performance. Focus on maintaining current fitness levels.")
+        insights.append("- Optimal age range for peak performance. Focus on maintaining current fitness levels.")
     elif age < 45:
-        insights.append("• Maintain consistent training to sustain performance levels and prevent age-related decline.")
+        insights.append("- Maintain consistent training to sustain performance levels and prevent age-related decline.")
     else:
-        insights.append("• Focus on mobility, flexibility, and injury prevention while maintaining cardiovascular fitness.")
+        insights.append("- Focus on mobility, flexibility, and injury prevention while maintaining cardiovascular fitness.")
     
     return '\n'.join(insights)
 
-# --- 4. ENHANCED PDF REPORT GENERATOR ---
+# --- 5. PDF GENERATOR WITH UNICODE SUPPORT ---
 class TitanPDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.font_name = 'helvetica'
-        # Try to use Unicode-compatible font if available
-        try:
-            # Check if DejaVu font files exist, otherwise use default
-            import os
-            if os.path.exists('DejaVuSansCondensed.ttf'):
-                self.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
-                if os.path.exists('DejaVuSansCondensed-Bold.ttf'):
-                    self.add_font('DejaVu', 'B', 'DejaVuSansCondensed-Bold.ttf', uni=True)
-                self.font_name = 'DejaVu'
-        except:
-            pass
+        # Use built-in font that supports basic Latin characters
+        self.set_font('helvetica', '', 10)
     
     def header(self):
         if self.page_no() == 1:
-            self.set_font(self.font_name, 'B', 20)
+            self.set_font('helvetica', 'B', 22)
             self.set_text_color(0, 98, 255)
-            self.cell(0, 15, 'BODY PERFORMANCE AI PRO', ln=True, align='C')
-            self.set_font(self.font_name, 'I', 10)
+            self.cell(0, 18, 'BODY PERFORMANCE AI PRO', ln=True, align='C')
+            self.set_font('helvetica', 'I', 11)
             self.set_text_color(100, 100, 100)
-            self.cell(0, 8, 'Advanced Neural Analytics Report', ln=True, align='C')
-            self.line(10, 30, 200, 30)
-            self.ln(15)
+            self.cell(0, 10, 'Advanced Neural Analytics Report', ln=True, align='C')
+            self.line(10, 35, 200, 35)
+            self.ln(18)
 
     def footer(self):
-        self.set_y(-20)
-        self.set_font(self.font_name, 'I', 8)
+        self.set_y(-22)
+        self.set_font('helvetica', 'I', 9)
         self.set_text_color(100, 100, 100)
         self.cell(0, 10, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', align='C')
         self.cell(0, 10, f'Page {self.page_no()}', align='R')
@@ -449,84 +496,84 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     clean_recs = clean_text_for_pdf(recs)
     
     # Athlete Information Section
-    pdf.set_font(pdf.font_name, 'B', 14)
+    pdf.set_font('helvetica', 'B', 15)
     pdf.set_text_color(0, 98, 255)
-    pdf.cell(0, 10, 'ATHLETE INFORMATION', ln=True)
-    pdf.set_font(pdf.font_name, '', 11)
+    pdf.cell(0, 12, 'ATHLETE INFORMATION', ln=True)
+    pdf.set_font('helvetica', '', 12)
     pdf.set_text_color(0, 0, 0)
     
     info_data = [
-        ['Athlete Name', clean_name[:50] if clean_name else 'Anonymous'],
+        ['Athlete Name', clean_name[:60] if clean_name else 'Anonymous'],
         ['Age', str(age)],
         ['Gender', gender],
         ['Assessment Date', datetime.now().strftime('%Y-%m-%d %H:%M')]
     ]
     
     for label, value in info_data:
-        pdf.set_font(pdf.font_name, 'B', 11)
-        pdf.cell(50, 8, label + ':', ln=False)
-        pdf.set_font(pdf.font_name, '', 11)
-        pdf.cell(0, 8, str(value), ln=True)
+        pdf.set_font('helvetica', 'B', 12)
+        pdf.cell(55, 10, label + ':', ln=False)
+        pdf.set_font('helvetica', '', 12)
+        pdf.cell(0, 10, str(value), ln=True)
     
-    pdf.ln(10)
+    pdf.ln(12)
     
     # Performance Results
-    pdf.set_font(pdf.font_name, 'B', 14)
+    pdf.set_font('helvetica', 'B', 15)
     pdf.set_text_color(0, 98, 255)
-    pdf.cell(0, 10, 'PERFORMANCE METRICS', ln=True)
+    pdf.cell(0, 12, 'PERFORMANCE METRICS', ln=True)
     pdf.set_fill_color(240, 240, 240)
     
     # Metrics Table
-    pdf.set_font(pdf.font_name, 'B', 11)
-    pdf.cell(100, 10, 'Metric', 1, 0, 'C', True)
-    pdf.cell(0, 10, 'Value', 1, 1, 'C', True)
+    pdf.set_font('helvetica', 'B', 12)
+    pdf.cell(105, 12, 'Metric', 1, 0, 'C', True)
+    pdf.cell(0, 12, 'Value', 1, 1, 'C', True)
     
-    pdf.set_font(pdf.font_name, '', 10)
+    pdf.set_font('helvetica', '', 11)
     for metric, value in metrics_dict.items():
-        clean_metric = clean_text_for_pdf(metric)[:40]
-        clean_value = clean_text_for_pdf(str(value))[:40]
-        pdf.cell(100, 8, clean_metric, 1)
-        pdf.cell(0, 8, clean_value, 1, 1)
+        clean_metric = clean_text_for_pdf(metric)[:45]
+        clean_value = clean_text_for_pdf(str(value))[:45]
+        pdf.cell(105, 10, clean_metric, 1)
+        pdf.cell(0, 10, clean_value, 1, 1)
     
-    pdf.ln(10)
+    pdf.ln(12)
     
     # Analysis Results
-    pdf.set_font(pdf.font_name, 'B', 12)
+    pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'AI ANALYSIS RESULTS:', ln=True)
-    pdf.set_font(pdf.font_name, '', 11)
+    pdf.set_font('helvetica', '', 12)
     pdf.cell(0, 10, f'Performance Grade: CLASS {p_class}', ln=True)
     pdf.cell(0, 10, f'Predicted Jump Distance: {p_jump:.2f} cm', ln=True)
     
-    pdf.ln(10)
+    pdf.ln(12)
     
     # Recommendations
-    pdf.set_font(pdf.font_name, 'B', 12)
+    pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'SYSTEM RECOMMENDATIONS:', ln=True)
-    pdf.set_font(pdf.font_name, '', 10)
+    pdf.set_font('helvetica', '', 11)
     
     # Split recommendations into lines and clean each line
     rec_lines = clean_recs.split('\n')
-    for line in rec_lines[:15]:  # Limit to 15 lines
+    for line in rec_lines[:15]:
         if line.strip():
-            clean_line = clean_text_for_pdf(line)[:80]
-            pdf.multi_cell(0, 6, clean_line)
+            clean_line = clean_text_for_pdf(line)[:85]
+            pdf.multi_cell(0, 7, clean_line)
     
     # Performance Insights
-    pdf.ln(5)
-    pdf.set_font(pdf.font_name, 'B', 11)
+    pdf.ln(8)
+    pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'PERFORMANCE INSIGHTS:', ln=True)
-    pdf.set_font(pdf.font_name, 'I', 10)
+    pdf.set_font('helvetica', 'I', 11)
     
     insights = get_performance_insights(p_class, p_jump, age)
     clean_insights = clean_text_for_pdf(insights)
     insight_lines = clean_insights.split('\n')
-    for line in insight_lines[:8]:  # Limit to 8 lines
+    for line in insight_lines[:8]:
         if line.strip():
-            pdf.multi_cell(0, 6, line[:80])
+            pdf.multi_cell(0, 7, line[:85])
     
     return pdf.output()
 
-# --- 5. MODEL LOADING WITH VERSION CHECK ---
+# --- 6. MODEL LOADING WITH VERSION CHECK ---
 @st.cache_resource
 def load_assets():
     """Load models with version verification"""
@@ -555,13 +602,13 @@ def load_assets():
     
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 6. SESSION STATE INITIALIZATION ---
+# --- 7. SESSION STATE INITIALIZATION ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
     st.session_state.last_analysis = None
 
-# --- 7. MAIN INTERFACE ---
+# --- 8. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ BODY PERFORMANCE AI PRO ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
@@ -573,7 +620,7 @@ with tab1:
     
     with col_in:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px;'>🧬 BIOMETRIC SCANNER</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px; font-size: 2rem;'>🧬 BIOMETRIC SCANNER</h2>", unsafe_allow_html=True)
         
         # User Input Section
         user_name = st.text_input("🏷️ ATHLETE NAME", "Enter athlete name...")
@@ -610,7 +657,7 @@ with tab1:
     
     with col_out:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px;'>🛰️ ANALYTICAL OUTPUT</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px; font-size: 2rem;'>🛰️ ANALYTICAL OUTPUT</h2>", unsafe_allow_html=True)
         
         if analyze:
             try:
@@ -676,9 +723,9 @@ with tab1:
                         mode="gauge+number+delta",
                         value=p_jump,
                         delta={'reference': 175, 'increasing': {'color': "#00ff00"}, 'decreasing': {'color': "#ff4444"}},
-                        title={'text': "Explosive Power Index", 'font': {'color': "#00f2ff", 'size': 18}},
+                        title={'text': "Explosive Power Index", 'font': {'color': "#00f2ff", 'size': 20}},
                         gauge={
-                            'axis': {'range': [None, 300], 'tickwidth': 1, 'tickcolor': "#00f2ff", 'tickfont': {'size': 12}},
+                            'axis': {'range': [None, 300], 'tickwidth': 1, 'tickcolor': "#00f2ff", 'tickfont': {'size': 14}},
                             'bar': {'color': "#00f2ff"},
                             'bgcolor': "#0f172a",
                             'borderwidth': 2,
@@ -695,7 +742,7 @@ with tab1:
                             }
                         }
                     ))
-                    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff", height=320)
+                    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff", height=350)
                     st.plotly_chart(fig, use_container_width=True)
                     
                     # Recommendations
@@ -726,18 +773,19 @@ with tab1:
                                 use_container_width=True
                             )
                         with col_btn2:
-                            st.button("🔄 RESET ANALYSIS", use_container_width=True)
+                            if st.button("🔄 RESET ANALYSIS", use_container_width=True):
+                                st.rerun()
                     except Exception as e:
-                        st.warning(f"PDF Generation: {e}")
+                        st.warning(f"PDF Generation Note: {str(e)[:100]}")
                     
             except Exception as e:
-                st.error(f"Analysis Error: {str(e)}")
+                st.error(f"Analysis Error: {str(e)[:200]}")
                 st.info("Please ensure all input values are valid and models are properly loaded.")
         else:
             st.info("⚡ Enter biometric data and click 'EXECUTE NEURAL ANALYSIS' to begin.")
             st.markdown("""
-            <div style="margin-top: 30px; padding: 20px; background: rgba(0,242,255,0.1); border-radius: 10px;">
-                <p style="color: #94a3b8; text-align: center;">
+            <div style="margin-top: 35px; padding: 25px; background: rgba(0,242,255,0.1); border-radius: 15px;">
+                <p style="color: #94a3b8; text-align: center; font-size: 1.2rem;">
                     The system will analyze your biometric data and provide:<br>
                     • Performance classification (A-D)<br>
                     • Predicted jump distance<br>
@@ -752,7 +800,7 @@ with tab1:
 with tab2:
     if st.session_state.last_analysis:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff;'>📊 PERFORMANCE RADAR</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 PERFORMANCE RADAR</h2>", unsafe_allow_html=True)
         
         # Get last analysis data
         last = st.session_state.last_analysis
@@ -773,8 +821,8 @@ with tab2:
             r=values,
             theta=categories,
             fill='toself',
-            marker=dict(color='rgba(0, 242, 255, 0.8)', size=8),
-            line=dict(color='#00f2ff', width=3),
+            marker=dict(color='rgba(0, 242, 255, 0.8)', size=10),
+            line=dict(color='#00f2ff', width=4),
             name='Current Performance'
         ))
         
@@ -783,25 +831,25 @@ with tab2:
                 radialaxis=dict(
                     visible=True,
                     range=[0, 100],
-                    tickfont=dict(color='#94a3b8', size=12)
+                    tickfont=dict(color='#94a3b8', size=14)
                 ),
                 angularaxis=dict(
-                    tickfont=dict(color='#00f2ff', size=12)
+                    tickfont=dict(color='#00f2ff', size=14)
                 )
             ),
             showlegend=True,
             title="Multi-Dimensional Performance Analysis",
-            title_font=dict(size=16, color='#00f2ff'),
+            title_font=dict(size=18, color='#00f2ff'),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font_color="#00f2ff",
-            height=500
+            height=550
         )
         
         st.plotly_chart(fig, use_container_width=True)
         
         # Performance metrics table
-        st.markdown("<h3 style='color:#00f2ff; margin-top: 30px;'>📈 DETAILED METRICS</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color:#00f2ff; margin-top: 35px; font-size: 1.8rem;'>📈 DETAILED METRICS</h3>", unsafe_allow_html=True)
         metrics_data = {
             'Metric': ['Performance Grade', 'Jump Distance', 'BMI', 'Body Fat %', 'Grip Strength', 'Flexibility', 'Sit-ups'],
             'Value': [f'Class {last["grade"]}', f'{last["jump"]:.1f} cm', f'{last["bmi"]:.1f}', f'{last["fat"]:.1f}%', 
@@ -821,7 +869,7 @@ with tab2:
 with tab3:
     if len(st.session_state.analysis_history) > 0:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff;'>📈 PERFORMANCE TRENDS</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📈 PERFORMANCE TRENDS</h2>", unsafe_allow_html=True)
         
         # Create trend visualization
         history_df = pd.DataFrame(st.session_state.analysis_history)
@@ -834,8 +882,8 @@ with tab3:
                 y=history_df['jump'],
                 mode='lines+markers',
                 name='Jump Distance',
-                line=dict(color='#00f2ff', width=4),
-                marker=dict(size=10, color='#0062ff', symbol='circle')
+                line=dict(color='#00f2ff', width=5),
+                marker=dict(size=12, color='#0062ff', symbol='circle')
             ))
             
             # Add trend line
@@ -848,20 +896,20 @@ with tab3:
                 y=trend_line,
                 mode='lines',
                 name='Trend Line',
-                line=dict(color='#ffaa44', width=2, dash='dash')
+                line=dict(color='#ffaa44', width=3, dash='dash')
             ))
             
             fig.update_layout(
                 title="Performance Evolution Over Time",
-                title_font=dict(size=16, color='#00f2ff'),
+                title_font=dict(size=18, color='#00f2ff'),
                 xaxis_title="Analysis Date",
                 yaxis_title="Jump Distance (cm)",
-                xaxis=dict(tickfont=dict(size=12)),
-                yaxis=dict(tickfont=dict(size=12)),
+                xaxis=dict(tickfont=dict(size=14)),
+                yaxis=dict(tickfont=dict(size=14)),
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 font_color="#00f2ff",
-                height=450,
+                height=500,
                 hovermode='x unified'
             )
             
@@ -897,28 +945,28 @@ with tab3:
 
 with tab4:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<h2 style='color:#00f2ff;'>📚 ATHLETE DEVELOPMENT RESOURCES</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📚 ATHLETE DEVELOPMENT RESOURCES</h2>", unsafe_allow_html=True)
     
     col_r1, col_r2 = st.columns(2)
     
     with col_r1:
         st.markdown("""
-        <div style="background: rgba(0,242,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-            <h3 style="color:#00f2ff;">🏋️ Training Protocols</h3>
+        <div style="background: rgba(0,242,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+            <h3 style="color:#00f2ff; font-size: 1.8rem;">🏋️ Training Protocols</h3>
             <hr style="border-color:#00f2ff;">
-            <p><strong>Elite Level (Class A)</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Elite Level (Class A)</strong><br>
             • Advanced periodization training<br>
             • Sport-specific explosive power drills<br>
             • Recovery optimization protocols<br>
             • 5-6 sessions per week</p>
             
-            <p><strong>Advanced Level (Class B)</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Advanced Level (Class B)</strong><br>
             • Progressive overload training<br>
             • Plyometric integration<br>
             • Nutrition optimization<br>
             • 4-5 sessions per week</p>
             
-            <p><strong>Developing Level (Class C/D)</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Developing Level (Class C/D)</strong><br>
             • Foundation strength building<br>
             • Mobility and flexibility focus<br>
             • Cardiovascular conditioning<br>
@@ -928,20 +976,20 @@ with tab4:
     
     with col_r2:
         st.markdown("""
-        <div style="background: rgba(0,242,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-            <h3 style="color:#00f2ff;">🥗 Nutrition Guidelines</h3>
+        <div style="background: rgba(0,242,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+            <h3 style="color:#00f2ff; font-size: 1.8rem;">🥗 Nutrition Guidelines</h3>
             <hr style="border-color:#00f2ff;">
-            <p><strong>Pre-Workout (2-3 hours before)</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Pre-Workout (2-3 hours before)</strong><br>
             • Complex carbohydrates (oatmeal, sweet potato)<br>
             • Lean protein (chicken, fish)<br>
             • Hydration (500ml water)</p>
             
-            <p><strong>Post-Workout (within 30 min)</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Post-Workout (within 30 min)</strong><br>
             • Fast-absorbing protein (whey)<br>
             • Simple carbohydrates (banana)<br>
             • Electrolyte replacement</p>
             
-            <p><strong>Daily Recommendations</strong><br>
+            <p style="font-size: 1.2rem;"><strong>Daily Recommendations</strong><br>
             • Protein: 1.6-2.2g/kg body weight<br>
             • Water: 3-4 liters<br>
             • Sleep: 7-9 hours</p>
@@ -949,24 +997,24 @@ with tab4:
         """, unsafe_allow_html=True)
     
     st.markdown("""
-    <div style="background: rgba(0,242,255,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
-        <h3 style="color:#00f2ff;">🔬 Research-Backed Insights</h3>
+    <div style="background: rgba(0,242,255,0.1); padding: 25px; border-radius: 15px; margin-top: 20px;">
+        <h3 style="color:#00f2ff; font-size: 1.8rem;">🔬 Research-Backed Insights</h3>
         <hr style="border-color:#00f2ff;">
-        <p>• <strong>Jump Performance</strong>: Vertical jump height correlates strongly with lower body power output (r=0.89)</p>
-        <p>• <strong>Body Composition</strong>: Optimal body fat % for athletes: 6-13% (male), 14-20% (female)</p>
-        <p>• <strong>Flexibility</strong>: Sit-and-reach values >20cm associated with reduced injury risk</p>
-        <p>• <strong>Core Strength</strong>: Sit-up capacity >50/min indicates excellent core endurance</p>
-        <p>• <strong>Recovery</strong>: Adequate sleep (7-9h) improves performance by up to 15%</p>
+        <p style="font-size: 1.2rem;">• <strong>Jump Performance</strong>: Vertical jump height correlates strongly with lower body power output (r=0.89)</p>
+        <p style="font-size: 1.2rem;">• <strong>Body Composition</strong>: Optimal body fat % for athletes: 6-13% (male), 14-20% (female)</p>
+        <p style="font-size: 1.2rem;">• <strong>Flexibility</strong>: Sit-and-reach values >20cm associated with reduced injury risk</p>
+        <p style="font-size: 1.2rem;">• <strong>Core Strength</strong>: Sit-up capacity >50/min indicates excellent core endurance</p>
+        <p style="font-size: 1.2rem;">• <strong>Recovery</strong>: Adequate sleep (7-9h) improves performance by up to 15%</p>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 8. FOOTER ---
+# --- 9. FOOTER ---
 st.markdown("""
 <div class='footer'>
-    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Real-time Analysis</p>
-    <p>© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
-    <p style="font-size: 0.8rem; margin-top: 10px;">Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
+    <p style="font-size: 1rem;">⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Real-time Analysis</p>
+    <p style="font-size: 0.95rem;">© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
+    <p style="font-size: 0.9rem; margin-top: 12px;">Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
 </div>
 """, unsafe_allow_html=True)
