@@ -161,7 +161,113 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. ENHANCED PDF REPORT GENERATOR ---
+# --- 3. HELPER FUNCTIONS (DEFINED FIRST) ---
+def get_percentile(grade):
+    percentiles = {'A': 'Top 15%', 'B': 'Top 35%', 'C': 'Average (50-70%)', 'D': 'Bottom 20%'}
+    return percentiles.get(grade, 'Average')
+
+def get_jump_percentile(jump):
+    if jump > 250: return 'Top 5%'
+    if jump > 200: return 'Top 20%'
+    if jump > 150: return 'Above Average'
+    return 'Below Average'
+
+def get_bmi_percentile(bmi):
+    if 18.5 <= bmi <= 24.9: return 'Optimal Range'
+    if bmi < 18.5: return 'Underweight'
+    return 'Overweight'
+
+def get_fat_percentile(fat):
+    if fat < 10: return 'Elite'
+    if fat < 18: return 'Athletic'
+    if fat < 25: return 'Average'
+    return 'High'
+
+def get_grip_percentile(grip):
+    if grip > 60: return 'Top 10%'
+    if grip > 45: return 'Above Average'
+    if grip > 30: return 'Average'
+    return 'Below Average'
+
+def get_flex_percentile(flex):
+    if flex > 25: return 'Excellent'
+    if flex > 15: return 'Good'
+    if flex > 5: return 'Average'
+    return 'Needs Improvement'
+
+def get_situps_percentile(situps):
+    if situps > 70: return 'Excellent'
+    if situps > 50: return 'Good'
+    if situps > 35: return 'Average'
+    return 'Needs Improvement'
+
+def generate_recommendations(grade, jump, age, bmi, fat):
+    """Generate personalized recommendations based on all metrics"""
+    recommendations = []
+    
+    if grade == 'A':
+        recommendations.append("🏆 **ELITE PERFORMER**: Maintain current training intensity with focus on injury prevention.")
+        recommendations.append("⚡ Optimize explosive power with advanced plyometric drills (box jumps, depth jumps).")
+        recommendations.append("🎯 Set competitive goals: aim to exceed personal records in vertical jump.")
+    elif grade == 'B':
+        recommendations.append("📈 **STRONG FOUNDATION**: Increase training intensity by 10-15% gradually.")
+        recommendations.append("💪 Focus on compound movements (squats, deadlifts) to enhance explosive power.")
+        recommendations.append("🧘 Add 15 minutes of dynamic stretching pre-workout.")
+    else:
+        recommendations.append("🌱 **DEVELOPMENT FOCUS**: Begin with bodyweight exercises to build foundation.")
+        recommendations.append("🏃‍♂️ Incorporate 30 minutes of cardio, 3 times weekly for endurance.")
+        recommendations.append("📅 Consistency is key - aim for 4 training sessions weekly.")
+    
+    # BMI-specific recommendations
+    if bmi > 25:
+        recommendations.append("⚖️ **WEIGHT MANAGEMENT**: Focus on caloric deficit of 300-500 calories/day.")
+    elif bmi < 18.5:
+        recommendations.append("🍽️ **NUTRITION FOCUS**: Increase caloric intake with nutrient-dense foods.")
+    
+    # Age-specific recommendations
+    if age > 45:
+        recommendations.append("🛡️ **INJURY PREVENTION**: Include 20 minutes of mobility work before each session.")
+    
+    # Jump-specific recommendations
+    if jump < 150:
+        recommendations.append("🦵 **POWER DEVELOPMENT**: Start with box squats and calf raises to build leg strength.")
+    
+    return "\n".join(recommendations)
+
+def get_performance_insights(grade, jump_distance, age):
+    """Generate detailed performance insights based on metrics"""
+    insights = []
+    
+    # Grade-based insights
+    grade_insights = {
+        'A': 'Elite Performance Level. Athlete demonstrates exceptional physical capabilities across all metrics.',
+        'B': 'Advanced Performance Level. Strong foundation with room for optimization in specific areas.',
+        'C': 'Intermediate Level. Good baseline with potential for significant improvement.',
+        'D': 'Development Level. Focus on fundamental fitness components is recommended.'
+    }
+    insights.append(f"• {grade_insights.get(grade, 'Standard performance level')}")
+    
+    # Jump distance analysis
+    if jump_distance > 250:
+        insights.append(f"• Exceptional explosive power! Jump distance ({jump_distance:.1f}cm) exceeds elite athlete standards.")
+    elif jump_distance > 200:
+        insights.append(f"• Excellent explosive power. Jump distance ({jump_distance:.1f}cm) indicates strong lower body strength.")
+    elif jump_distance > 150:
+        insights.append(f"• Good explosive power. Focus on plyometric training could enhance jump performance.")
+    else:
+        insights.append(f"• Jump distance ({jump_distance:.1f}cm) suggests need for focused lower body strength training.")
+    
+    # Age-adjusted analysis
+    if age < 30:
+        insights.append("• Optimal age range for peak performance. Focus on maintaining current fitness levels.")
+    elif age < 45:
+        insights.append("• Maintain consistent training to sustain performance levels and prevent age-related decline.")
+    else:
+        insights.append("• Focus on mobility, flexibility, and injury prevention while maintaining cardiovascular fitness.")
+    
+    return '\n'.join(insights)
+
+# --- 4. ENHANCED PDF REPORT GENERATOR ---
 class TitanPDF(FPDF):
     def header(self):
         if self.page_no() == 1:
@@ -252,40 +358,7 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     
     return pdf.output()
 
-def get_performance_insights(grade, jump_distance, age):
-    """Generate detailed performance insights based on metrics"""
-    insights = []
-    
-    # Grade-based insights
-    grade_insights = {
-        'A': 'Elite Performance Level. Athlete demonstrates exceptional physical capabilities across all metrics.',
-        'B': 'Advanced Performance Level. Strong foundation with room for optimization in specific areas.',
-        'C': 'Intermediate Level. Good baseline with potential for significant improvement.',
-        'D': 'Development Level. Focus on fundamental fitness components is recommended.'
-    }
-    insights.append(f"• {grade_insights.get(grade, 'Standard performance level')}")
-    
-    # Jump distance analysis
-    if jump_distance > 250:
-        insights.append(f"• Exceptional explosive power! Jump distance ({jump_distance:.1f}cm) exceeds elite athlete standards.")
-    elif jump_distance > 200:
-        insights.append(f"• Excellent explosive power. Jump distance ({jump_distance:.1f}cm) indicates strong lower body strength.")
-    elif jump_distance > 150:
-        insights.append(f"• Good explosive power. Focus on plyometric training could enhance jump performance.")
-    else:
-        insights.append(f"• Jump distance ({jump_distance:.1f}cm) suggests need for focused lower body strength training.")
-    
-    # Age-adjusted analysis
-    if age < 30:
-        insights.append("• Optimal age range for peak performance. Focus on maintaining current fitness levels.")
-    elif age < 45:
-        insights.append("• Maintain consistent training to sustain performance levels and prevent age-related decline.")
-    else:
-        insights.append("• Focus on mobility, flexibility, and injury prevention while maintaining cardiovascular fitness.")
-    
-    return '\n'.join(insights)
-
-# --- 4. MODEL LOADING WITH VERSION CHECK ---
+# --- 5. MODEL LOADING WITH VERSION CHECK ---
 @st.cache_resource
 def load_assets():
     """Load models with version verification"""
@@ -314,13 +387,13 @@ def load_assets():
     
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 5. SESSION STATE INITIALIZATION ---
+# --- 6. SESSION STATE INITIALIZATION ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
     st.session_state.last_analysis = None
 
-# --- 6. MAIN INTERFACE ---
+# --- 7. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ TITAN PERFORMANCE AI ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #94a3b8; margin-top: -20px;'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
@@ -411,6 +484,9 @@ with tab1:
                         'jump': p_jump,
                         'bmi': bmi,
                         'fat': fat,
+                        'grip': grip,
+                        'flex': flex,
+                        'situps': situps,
                         'timestamp': datetime.now()
                     }
                     st.session_state.analysis_history.append(st.session_state.last_analysis)
@@ -495,15 +571,18 @@ with tab2:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.markdown("### 📊 PERFORMANCE RADAR")
         
+        # Get last analysis data
+        last = st.session_state.last_analysis
+        
         # Create radar chart for performance metrics
         categories = ['Strength', 'Flexibility', 'Endurance', 'Power', 'BMI']
         
         # Calculate normalized scores
-        strength_score = min(100, (grip / 60) * 100)
-        flexibility_score = min(100, ((flex + 20) / 60) * 100)
-        endurance_score = min(100, (situps / 80) * 100)
-        power_score = min(100, (p_jump / 280) * 100)
-        bmi_score = 100 - abs(bmi - 22) * 5
+        strength_score = min(100, (last['grip'] / 60) * 100)
+        flexibility_score = min(100, ((last['flex'] + 20) / 60) * 100)
+        endurance_score = min(100, (last['situps'] / 80) * 100)
+        power_score = min(100, (last['jump'] / 280) * 100)
+        bmi_score = 100 - abs(last['bmi'] - 22) * 5
         
         values = [strength_score, flexibility_score, endurance_score, power_score, max(0, min(100, bmi_score))]
         
@@ -541,9 +620,11 @@ with tab2:
         st.markdown("### 📈 DETAILED METRICS")
         metrics_data = {
             'Metric': ['Performance Grade', 'Jump Distance', 'BMI', 'Body Fat %', 'Grip Strength', 'Flexibility', 'Sit-ups'],
-            'Value': [f'Class {p_class}', f'{p_jump:.1f} cm', f'{bmi:.1f}', f'{fat:.1f}%', f'{grip:.1f} kg', f'{flex:.1f} cm', f'{situps} reps'],
-            'Percentile': [get_percentile(p_class), get_jump_percentile(p_jump), get_bmi_percentile(bmi), get_fat_percentile(fat), 
-                          get_grip_percentile(grip), get_flex_percentile(flex), get_situps_percentile(situps)]
+            'Value': [f'Class {last["grade"]}', f'{last["jump"]:.1f} cm', f'{last["bmi"]:.1f}', f'{last["fat"]:.1f}%', 
+                     f'{last["grip"]:.1f} kg', f'{last["flex"]:.1f} cm', f'{last["situps"]} reps'],
+            'Percentile': [get_percentile(last["grade"]), get_jump_percentile(last["jump"]), get_bmi_percentile(last["bmi"]), 
+                          get_fat_percentile(last["fat"]), get_grip_percentile(last["grip"]), 
+                          get_flex_percentile(last["flex"]), get_situps_percentile(last["situps"])]
         }
         
         df_metrics = pd.DataFrame(metrics_data)
@@ -658,79 +739,6 @@ with tab4:
         """)
     
     st.markdown('</div>', unsafe_allow_html=True)
-
-# --- 7. HELPER FUNCTIONS ---
-def generate_recommendations(grade, jump, age, bmi, fat):
-    """Generate personalized recommendations based on all metrics"""
-    recommendations = []
-    
-    if grade == 'A':
-        recommendations.append("🏆 **ELITE PERFORMER**: Maintain current training intensity with focus on injury prevention.")
-        recommendations.append("⚡ Optimize explosive power with advanced plyometric drills (box jumps, depth jumps).")
-        recommendations.append("🎯 Set competitive goals: aim to exceed personal records in vertical jump.")
-    elif grade == 'B':
-        recommendations.append("📈 **STRONG FOUNDATION**: Increase training intensity by 10-15% gradually.")
-        recommendations.append("💪 Focus on compound movements (squats, deadlifts) to enhance explosive power.")
-        recommendations.append("🧘 Add 15 minutes of dynamic stretching pre-workout.")
-    else:
-        recommendations.append("🌱 **DEVELOPMENT FOCUS**: Begin with bodyweight exercises to build foundation.")
-        recommendations.append("🏃‍♂️ Incorporate 30 minutes of cardio, 3 times weekly for endurance.")
-        recommendations.append("📅 Consistency is key - aim for 4 training sessions weekly.")
-    
-    # BMI-specific recommendations
-    if bmi > 25:
-        recommendations.append("⚖️ **WEIGHT MANAGEMENT**: Focus on caloric deficit of 300-500 calories/day.")
-    elif bmi < 18.5:
-        recommendations.append("🍽️ **NUTRITION FOCUS**: Increase caloric intake with nutrient-dense foods.")
-    
-    # Age-specific recommendations
-    if age > 45:
-        recommendations.append("🛡️ **INJURY PREVENTION**: Include 20 minutes of mobility work before each session.")
-    
-    # Jump-specific recommendations
-    if jump < 150:
-        recommendations.append("🦵 **POWER DEVELOPMENT**: Start with box squats and calf raises to build leg strength.")
-    
-    return "\n".join(recommendations)
-
-def get_percentile(grade):
-    percentiles = {'A': 'Top 15%', 'B': 'Top 35%', 'C': 'Average (50-70%)', 'D': 'Bottom 20%'}
-    return percentiles.get(grade, 'Average')
-
-def get_jump_percentile(jump):
-    if jump > 250: return 'Top 5%'
-    if jump > 200: return 'Top 20%'
-    if jump > 150: return 'Above Average'
-    return 'Below Average'
-
-def get_bmi_percentile(bmi):
-    if 18.5 <= bmi <= 24.9: return 'Optimal Range'
-    if bmi < 18.5: return 'Underweight'
-    return 'Overweight'
-
-def get_fat_percentile(fat):
-    if fat < 10: return 'Elite'
-    if fat < 18: return 'Athletic'
-    if fat < 25: return 'Average'
-    return 'High'
-
-def get_grip_percentile(grip):
-    if grip > 60: return 'Top 10%'
-    if grip > 45: return 'Above Average'
-    if grip > 30: return 'Average'
-    return 'Below Average'
-
-def get_flex_percentile(flex):
-    if flex > 25: return 'Excellent'
-    if flex > 15: return 'Good'
-    if flex > 5: return 'Average'
-    return 'Needs Improvement'
-
-def get_situps_percentile(situps):
-    if situps > 70: return 'Excellent'
-    if situps > 50: return 'Good'
-    if situps > 35: return 'Average'
-    return 'Needs Improvement'
 
 # --- 8. FOOTER ---
 st.markdown("""
