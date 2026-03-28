@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import plotly.graph_objects as go
 import time
-from fpdf import FPDF
+from fpdf import FPDF # تأكد من تثبيت fpdf2
 import base64
 
 # --- 1. إعدادات النظام المتقدمة ---
@@ -38,27 +38,37 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. وظيفة إنشاء تقرير PDF ---
-class PDF(FPDF):
-    def header(self):
-        self.set_font('Arial', 'B', 15)
-        self.cell(0, 10, 'TITAN-AI: Body Performance Report', 0, 1, 'C')
-        self.ln(10)
-
+# --- 2. وظيفة إنشاء تقرير PDF (نسخة fpdf2 المحدثة) ---
 def create_pdf(name, age, gender, p_class, p_jump, recs):
-    pdf = PDF()
+    pdf = FPDF()
     pdf.add_page()
-    pdf.set_font('Arial', '', 12)
-    pdf.cell(0, 10, f"Name: {name}", 0, 1)
-    pdf.cell(0, 10, f"Age: {age} | Gender: {gender}", 0, 1)
-    pdf.ln(5)
-    pdf.set_font('Arial', 'B', 14)
-    pdf.cell(0, 10, f"Final Performance Grade: {p_class}", 0, 1)
-    pdf.cell(0, 10, f"Predicted Broad Jump: {p_jump:.2f} cm", 0, 1)
+    
+    # عنوان التقرير
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(0, 10, 'TITAN-AI: Body Performance Report', ln=True, align='C')
     pdf.ln(10)
+    
+    # بيانات المستخدم
+    pdf.set_font('Arial', '', 12)
+    pdf.cell(0, 10, f"Subject Name: {name}", ln=True)
+    pdf.cell(0, 10, f"Age: {age} | Gender: {gender}", ln=True)
+    pdf.ln(5)
+    
+    # النتائج النهائية
+    pdf.set_font('Arial', 'B', 14)
+    pdf.set_fill_color(0, 242, 255)
+    pdf.cell(0, 10, f" Final Results ", ln=True, fill=False)
+    pdf.set_font('Arial', '', 12)
+    pdf.cell(0, 10, f"Performance Grade: Class {p_class}", ln=True)
+    pdf.cell(0, 10, f"Predicted Broad Jump: {p_jump:.2f} cm", ln=True)
+    pdf.ln(10)
+    
+    # التوصيات
     pdf.set_font('Arial', 'I', 11)
     pdf.multi_cell(0, 10, f"System Recommendation: {recs}")
-    return pdf.output(dest='S').encode('latin-1')
+    
+    # الإخراج كـ bytes مباشرة (متوافق مع fpdf2)
+    return pdf.output()
 
 # --- 3. تحميل النماذج والبيانات ---
 @st.cache_resource
@@ -81,7 +91,6 @@ with st.sidebar:
     for dev in ["A. Zoghli", "E. TagElsir", "O. Mohamed", "M. Hassan", "A. Ibrahim"]:
         st.code(f"ID: {dev.split('.')[1].strip().upper()}")
 
-# الجزء الرئيسي للتحليل
 col_in, col_out = st.columns([1, 1.2])
 
 with col_in:
@@ -100,7 +109,7 @@ with col_in:
         sys = st.number_input("SYSTOLIC BP", 80, 200, 120)
         dias = st.number_input("DIASTOLIC BP", 40, 130, 80)
 
-    analyze = st.button("RUN CORE SCAN")
+    analyze = st.button("EXECUTE CORE SCAN")
 
 if analyze:
     with st.spinner("PROCESSING DATA STREAMS..."):
@@ -119,21 +128,21 @@ if analyze:
             r1.metric("GRADE", f"RANK_{p_class}")
             r2.metric("POWER", f"{p_jump:.1f} CM")
             
-            # توصية بسيطة للتقرير
             rec_text = f"The subject is classified as Grade {p_class}. Focus on flexibility and core stability is recommended to enhance explosive power."
-            
             st.info(f"💡 {rec_text}")
             
-            # زر تحميل التتقرير
-            pdf_data = create_pdf(user_name, age, gender, p_class, p_jump, rec_text)
-            st.download_button(
-                label="📥 DOWNLOAD PERFORMANCE REPORT (PDF)",
-                data=pdf_data,
-                file_name=f"Report_{user_name}.pdf",
-                mime="application/pdf"
-            )
+            # معالجة استخراج الـ PDF بأمان
+            try:
+                pdf_output = create_pdf(user_name, age, gender, p_class, p_jump, rec_text)
+                st.download_button(
+                    label="📥 DOWNLOAD PERFORMANCE REPORT (PDF)",
+                    data=bytes(pdf_output),
+                    file_name=f"Titan_Report_{user_name}.pdf",
+                    mime="application/pdf"
+                )
+            except Exception as e:
+                st.error(f"Error generating PDF: {e}")
             
-            # رسم بياني توضيحي
             fig = go.Figure(go.Indicator(
                 mode = "gauge+number",
                 value = p_jump,
@@ -143,4 +152,4 @@ if analyze:
             fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff", height=300)
             st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("<p style='text-align: center; color: #334155; margin-top: 50px;'>// TITAN CORE V4.0 // SECURE REPORTING ENABLED // 2026</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #334155; margin-top: 50px;'>// TITAN CORE V4.1 // SECURE REPORTING ENABLED // 2026</p>", unsafe_allow_html=True)
