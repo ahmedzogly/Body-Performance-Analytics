@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 import re
 import io
-import chardet
+import chardet  # Add this for encoding detection
 
 # --- 1. SYSTEM CONFIGURATION ---
 st.set_page_config(
@@ -304,9 +304,12 @@ st.markdown("""
 
 # --- 3. TEXT CLEANING FOR PDF ---
 def clean_text_for_pdf(text):
+    """Remove or replace all special characters and emojis for PDF compatibility"""
     if not text:
         return ""
+    
     text = re.sub(r'[\u200B-\u200D\uFEFF]', '', text)
+    
     emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"
         u"\U0001F300-\U0001F5FF"
@@ -321,7 +324,9 @@ def clean_text_for_pdf(text):
         u"\U0001F000-\U0001F02F"
         u"\U0001F0A0-\U0001F0FF"
         "]+", flags=re.UNICODE)
+    
     cleaned = emoji_pattern.sub(r'', text)
+    
     replacements = {
         '🏆': 'CHAMPION', '⚡': 'POWER', '📊': 'DATA', '🔬': 'LAB', '🧬': 'DNA',
         '🛰️': 'SATELLITE', '📈': 'TREND', '📚': 'LIBRARY', '💪': 'STRENGTH',
@@ -331,10 +336,13 @@ def clean_text_for_pdf(text):
         '🎉': 'SUCCESS', '📝': 'NOTE', '🔍': 'SEARCH', '💡': 'TIP', '🚀': 'LAUNCH',
         '🔄': 'RESET', '📥': 'DOWNLOAD', '🧠': 'BRAIN', '🏷️': 'TAG', '⚥': 'GENDER'
     }
+    
     for emoji, replacement in replacements.items():
         cleaned = cleaned.replace(emoji, replacement)
+    
     cleaned = re.sub(r'[^\x00-\x7F]+', ' ', cleaned)
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
     return cleaned if cleaned else "Information"
 
 # --- 4. HELPER FUNCTIONS ---
@@ -379,6 +387,7 @@ def get_situps_percentile(situps):
 
 def generate_recommendations(grade, jump, age, bmi, fat):
     recommendations = []
+    
     if grade == 'A':
         recommendations.append("ELITE PERFORMER: Maintain current training intensity with focus on injury prevention.")
         recommendations.append("Optimize explosive power with advanced plyometric drills.")
@@ -391,18 +400,23 @@ def generate_recommendations(grade, jump, age, bmi, fat):
         recommendations.append("DEVELOPMENT FOCUS: Begin with bodyweight exercises.")
         recommendations.append("Incorporate 30 minutes of cardio, 3 times weekly.")
         recommendations.append("Consistency is key - aim for 4 training sessions weekly.")
+    
     if bmi > 25:
         recommendations.append("WEIGHT MANAGEMENT: Focus on caloric deficit of 300-500 calories/day.")
     elif bmi < 18.5:
         recommendations.append("NUTRITION FOCUS: Increase caloric intake with nutrient-dense foods.")
+    
     if age > 45:
         recommendations.append("INJURY PREVENTION: Include 20 minutes of mobility work.")
+    
     if jump < 150:
         recommendations.append("POWER DEVELOPMENT: Focus on leg strength exercises.")
+    
     return "\n".join(recommendations)
 
 def get_performance_insights(grade, jump_distance, age):
     insights = []
+    
     grade_insights = {
         'A': 'Elite Performance Level.',
         'B': 'Advanced Performance Level.',
@@ -410,6 +424,7 @@ def get_performance_insights(grade, jump_distance, age):
         'D': 'Development Level.'
     }
     insights.append(f"- {grade_insights.get(grade, 'Standard level')}")
+    
     if jump_distance > 250:
         insights.append(f"- Exceptional explosive power! Jump: {jump_distance:.1f}cm")
     elif jump_distance > 200:
@@ -418,12 +433,14 @@ def get_performance_insights(grade, jump_distance, age):
         insights.append(f"- Good explosive power. Jump: {jump_distance:.1f}cm")
     else:
         insights.append(f"- Jump distance ({jump_distance:.1f}cm) needs improvement.")
+    
     if age < 30:
         insights.append("- Optimal age for peak performance.")
     elif age < 45:
         insights.append("- Maintain consistent training.")
     else:
         insights.append("- Focus on mobility and injury prevention.")
+    
     return '\n'.join(insights)
 
 # --- 5. PDF GENERATOR ---
@@ -452,64 +469,81 @@ class TitanPDF(FPDF):
 def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     pdf = TitanPDF()
     pdf.add_page()
+    
     clean_name = clean_text_for_pdf(name) if name else "Athlete"
     clean_recs = clean_text_for_pdf(recs)
+    
     pdf.set_font('helvetica', 'B', 15)
     pdf.set_text_color(0, 98, 255)
     pdf.cell(0, 12, 'ATHLETE INFORMATION', ln=True)
     pdf.set_font('helvetica', '', 12)
     pdf.set_text_color(0, 0, 0)
+    
     info_data = [
         ['Athlete Name', clean_name[:60]],
         ['Age', str(age)],
         ['Gender', gender],
         ['Assessment Date', datetime.now().strftime('%Y-%m-%d %H:%M')]
     ]
+    
     for label, value in info_data:
         pdf.set_font('helvetica', 'B', 12)
         pdf.cell(55, 10, label + ':', ln=False)
         pdf.set_font('helvetica', '', 12)
         pdf.cell(0, 10, str(value), ln=True)
+    
     pdf.ln(12)
+    
     pdf.set_font('helvetica', 'B', 15)
     pdf.set_text_color(0, 98, 255)
     pdf.cell(0, 12, 'PERFORMANCE METRICS', ln=True)
     pdf.set_fill_color(240, 240, 240)
+    
     pdf.set_font('helvetica', 'B', 12)
     pdf.cell(105, 12, 'Metric', 1, 0, 'C', True)
     pdf.cell(0, 12, 'Value', 1, 1, 'C', True)
+    
     pdf.set_font('helvetica', '', 11)
     for metric, value in metrics_dict.items():
         clean_metric = clean_text_for_pdf(metric)[:45]
         clean_value = clean_text_for_pdf(str(value))[:45]
         pdf.cell(105, 10, clean_metric, 1)
         pdf.cell(0, 10, clean_value, 1, 1)
+    
     pdf.ln(12)
+    
     pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'AI ANALYSIS RESULTS:', ln=True)
     pdf.set_font('helvetica', '', 12)
     pdf.cell(0, 10, f'Performance Grade: CLASS {p_class}', ln=True)
     pdf.cell(0, 10, f'Predicted Jump Distance: {p_jump:.2f} cm', ln=True)
+    
     pdf.ln(12)
+    
     pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'SYSTEM RECOMMENDATIONS:', ln=True)
     pdf.set_font('helvetica', '', 11)
+    
     rec_lines = clean_recs.split('\n')
     for line in rec_lines[:15]:
         if line.strip():
             clean_line = clean_text_for_pdf(line)[:85]
             pdf.multi_cell(0, 7, clean_line)
+    
     pdf.ln(8)
     pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'PERFORMANCE INSIGHTS:', ln=True)
     pdf.set_font('helvetica', 'I', 11)
+    
     insights = get_performance_insights(p_class, p_jump, age)
     clean_insights = clean_text_for_pdf(insights)
     insight_lines = clean_insights.split('\n')
     for line in insight_lines[:8]:
         if line.strip():
             pdf.multi_cell(0, 7, line[:85])
+    
     pdf_output = pdf.output()
+    
     if isinstance(pdf_output, bytearray):
         return bytes(pdf_output)
     elif isinstance(pdf_output, bytes):
@@ -521,12 +555,15 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
 @st.cache_resource
 def load_assets():
     model_dir = Path('.')
+    
     models = {
         'classifier': 'classifier_model.pkl',
         'regression': 'regression_model.pkl',
         'scaler': 'scaler.pkl'
     }
+    
     loaded_models = {}
+    
     for model_name, filename in models.items():
         model_path = model_dir / filename
         if model_path.exists():
@@ -539,84 +576,71 @@ def load_assets():
         else:
             st.sidebar.error(f"❌ {filename} not found")
             return None
+    
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. ENHANCED FILE PROCESSING WITH COLUMN MAPPING ---
+# --- 7. ENHANCED FILE PROCESSING FUNCTION WITH ENCODING DETECTION ---
 def detect_encoding(file_bytes):
+    """Detect file encoding using chardet"""
     try:
         result = chardet.detect(file_bytes)
-        return result['encoding'], result['confidence']
+        encoding = result['encoding']
+        confidence = result['confidence']
+        return encoding, confidence
     except:
         return None, 0
 
-def map_column_names(df):
-    """Map various column name variations to standard names"""
-    column_mapping = {
-        # Age variations
-        'age': 'age', 'Age': 'age', 'AGE': 'age',
-        # Gender variations
-        'gender': 'gender', 'Gender': 'gender', 'GENDER': 'gender',
-        # Height variations
-        'height_cm': 'height_cm', 'height': 'height_cm', 'Height': 'height_cm', 'HEIGHT': 'height_cm',
-        # Weight variations
-        'weight_kg': 'weight_kg', 'weight': 'weight_kg', 'Weight': 'weight_kg', 'WEIGHT': 'weight_kg',
-        # Body fat variations
-        'body_fat_pct': 'body_fat_pct', 'body_fat': 'body_fat_pct', 'fat': 'body_fat_pct',
-        'body_fat_percentage': 'body_fat_pct', 'BodyFat': 'body_fat_pct',
-        # Blood pressure variations
-        'diastolic': 'diastolic', 'Diastolic': 'diastolic', 'DIASTOLIC': 'diastolic',
-        'systolic': 'systolic', 'Systolic': 'systolic', 'SYSTOLIC': 'systolic',
-        # Grip force variations
-        'gripForce': 'gripForce', 'grip_force': 'gripForce', 'grip': 'gripForce',
-        'GripForce': 'gripForce', 'GRIPFORCE': 'gripForce',
-        # Flexibility variations
-        'sit_bend_forward_cm': 'sit_bend_forward_cm', 'sit_bend': 'sit_bend_forward_cm',
-        'flexibility': 'sit_bend_forward_cm', 'bend': 'sit_bend_forward_cm',
-        # Sit-ups variations
-        'sit_ups_counts': 'sit_ups_counts', 'sit_ups': 'sit_ups_counts', 'situps': 'sit_ups_counts',
-        'SitUps': 'sit_ups_counts', 'sit-ups': 'sit_ups_counts'
-    }
-    
-    # Rename columns
-    df_renamed = df.copy()
-    for old_col, new_col in column_mapping.items():
-        if old_col in df_renamed.columns and old_col != new_col:
-            df_renamed.rename(columns={old_col: new_col}, inplace=True)
-    
-    return df_renamed
-
 def process_uploaded_file(uploaded_file):
+    """Process uploaded file (Excel or CSV) with encoding detection for CSV"""
     file_extension = uploaded_file.name.split('.')[-1].lower()
     
     try:
         if file_extension == 'csv':
+            # Read file bytes for encoding detection
             file_bytes = uploaded_file.getvalue()
+            
+            # Detect encoding
             encoding, confidence = detect_encoding(file_bytes)
+            
             if encoding:
                 st.info(f"🔍 Detected encoding: {encoding} (confidence: {confidence:.2%})")
+                
+                # Try to read with detected encoding
                 try:
+                    # Convert bytes to string with detected encoding
                     text_content = file_bytes.decode(encoding)
+                    # Use StringIO to read as CSV
                     from io import StringIO
                     df = pd.read_csv(StringIO(text_content))
-                    st.success(f"✅ CSV file loaded successfully! Found {len(df)} records.")
+                    st.success(f"✅ CSV file loaded successfully with {encoding} encoding! Found {len(df)} records.")
                     return df
-                except:
-                    pass
+                except Exception as e:
+                    st.warning(f"Failed with detected encoding {encoding}. Trying fallback encodings...")
             
-            # Fallback encodings
-            encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'cp1256', 'windows-1256', 'utf-16']
+            # Fallback: Try multiple encodings
+            encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'cp1256', 'windows-1256', 'utf-16', 'utf-16le']
+            
             for enc in encodings_to_try:
                 try:
+                    # Reset file pointer
                     uploaded_file.seek(0)
                     df = pd.read_csv(uploaded_file, encoding=enc)
-                    st.success(f"✅ CSV file loaded with {enc} encoding! Found {len(df)} records.")
+                    st.success(f"✅ CSV file loaded successfully with {enc} encoding! Found {len(df)} records.")
                     return df
                 except:
                     continue
             
-            raise Exception("Could not read CSV file")
+            # If all encodings fail, try with error handling
+            try:
+                uploaded_file.seek(0)
+                df = pd.read_csv(uploaded_file, encoding='utf-8', errors='ignore')
+                st.warning("⚠️ Loaded with UTF-8 ignoring errors. Some characters may be missing.")
+                return df
+            except:
+                raise Exception("Could not read CSV file with any encoding")
         
         elif file_extension in ['xlsx', 'xls']:
+            # For Excel files, no encoding issues
             df = pd.read_excel(uploaded_file)
             st.success(f"✅ Excel file loaded successfully! Found {len(df)} records.")
             return df
@@ -628,34 +652,9 @@ def process_uploaded_file(uploaded_file):
         st.error(f"Error reading file: {str(e)}")
         return None
 
-def extract_features_from_row(row):
-    """Extract features from row with flexible column names"""
-    # Standard feature names
-    feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                    'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
-    
-    features = []
-    for col in feature_names:
-        if col in row.index:
-            val = row[col]
-            # Handle gender specially
-            if col == 'gender':
-                if isinstance(val, str):
-                    val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
-                elif pd.isna(val):
-                    val = 0
-            # Convert to float
-            try:
-                features.append(float(val) if pd.notna(val) else 0)
-            except:
-                features.append(0)
-        else:
-            features.append(0)
-    
-    return features
-
+# --- 8. BATCH ANALYSIS FUNCTION ---
 def analyze_batch_data(df, scaler, clf, reg):
-    """Analyze batch data with flexible column handling"""
+    """Analyze batch data from uploaded file"""
     feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
@@ -666,17 +665,16 @@ def analyze_batch_data(df, scaler, clf, reg):
             # Extract features
             features = []
             for col in feature_names:
-                if col in row.index:
+                if col in row:
                     val = row[col]
+                    # Handle gender (convert M/F to 0/1 if needed)
                     if col == 'gender':
                         if isinstance(val, str):
                             val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
                         elif isinstance(val, (int, float)):
+                            # Already numeric, keep as is
                             pass
-                    try:
-                        features.append(float(val) if pd.notna(val) else 0)
-                    except:
-                        features.append(0)
+                    features.append(float(val) if pd.notna(val) else 0)
                 else:
                     features.append(0)
             
@@ -686,8 +684,8 @@ def analyze_batch_data(df, scaler, clf, reg):
             p_jump = reg.predict(scaled_data)[0]
             
             # Calculate BMI
-            height = row.get('height_cm', row.get('height', 170))
-            weight = row.get('weight_kg', row.get('weight', 70))
+            height = row.get('height_cm', 170)
+            weight = row.get('weight_kg', 70)
             bmi = weight / ((height/100) ** 2) if height > 0 else 0
             
             results.append({
@@ -708,7 +706,7 @@ def analyze_batch_data(df, scaler, clf, reg):
     
     return pd.DataFrame(results)
 
-# --- 8. SESSION STATE ---
+# --- 9. SESSION STATE ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
@@ -716,7 +714,7 @@ if 'last_analysis' not in st.session_state:
 if 'batch_results' not in st.session_state:
     st.session_state.batch_results = None
 
-# --- 9. MAIN INTERFACE ---
+# --- 10. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ BODY PERFORMANCE AI PRO ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
@@ -855,33 +853,41 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS ---
+# --- TAB 2: BATCH ANALYSIS (SUPPORTS EXCEL AND CSV WITH ENCODING DETECTION) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload Excel or CSV file (supports various column name formats)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload an Excel (.xlsx, .xls) or CSV file with the same format as the training data for batch analysis</p>", unsafe_allow_html=True)
     
+    # File upload with multiple format support
     uploaded_file = st.file_uploader(
         "📁 Upload File (CSV, Excel)",
         type=['csv', 'xlsx', 'xls'],
-        help="Upload file with columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts"
+        help="Upload CSV or Excel file with columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts"
     )
     
     if uploaded_file is not None:
+        # Process the uploaded file with enhanced encoding detection
         df = process_uploaded_file(uploaded_file)
         
         if df is not None:
-            # Show original column names
-            st.info(f"📄 Original columns: {', '.join(df.columns)}")
-            
-            # Map column names to standard format
-            df = map_column_names(df)
-            st.success(f"✅ Mapped columns. Standard columns available: {', '.join([c for c in ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'] if c in df.columns])}")
+            # Display file info
+            file_extension = uploaded_file.name.split('.')[-1].upper()
+            st.info(f"📄 File Type: {file_extension} | Rows: {len(df)} | Columns: {len(df.columns)}")
             
             # Display first few rows
             with st.expander("📋 Preview Uploaded Data", expanded=True):
                 st.dataframe(df.head(10), use_container_width=True)
-                st.caption(f"Total rows: {len(df)}")
+                st.caption(f"Total rows: {len(df)} | Columns: {', '.join(df.columns)}")
+            
+            # Check required columns
+            required_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+                           'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
+            
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            if missing_cols:
+                st.warning(f"⚠️ Missing columns: {missing_cols}")
+                st.info("The system will attempt to use available data. Missing columns will be filled with 0.")
             
             # Analyze button
             if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
@@ -896,33 +902,34 @@ with tab2:
                         results = []
                         
                         for idx, row in df.iterrows():
+                            # Update progress
                             progress_bar.progress((idx + 1) / len(df))
                             
                             try:
+                                # Prepare features
                                 features = []
-                                # Try to get features from row
-                                for col in ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                                          'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']:
-                                    if col in row.index:
+                                for col in required_cols:
+                                    if col in row:
                                         val = row[col]
+                                        # Handle gender (convert M/F to 0/1 if needed)
                                         if col == 'gender':
                                             if isinstance(val, str):
                                                 val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
-                                            elif pd.isna(val):
-                                                val = 0
+                                            elif isinstance(val, (int, float)):
+                                                # Already numeric, keep as is
+                                                pass
                                         features.append(float(val) if pd.notna(val) else 0)
                                     else:
                                         features.append(0)
                                 
-                                input_df = pd.DataFrame([features[:10]], columns=['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                                                                                 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'])
+                                input_df = pd.DataFrame([features[:10]], columns=required_cols)
                                 scaled_data = scaler.transform(input_df)
                                 p_class = clf.predict(scaled_data)[0]
                                 p_jump = reg.predict(scaled_data)[0]
                                 
                                 # Calculate BMI
-                                height = row.get('height_cm', row.get('height', 170))
-                                weight = row.get('weight_kg', row.get('weight', 70))
+                                height = row.get('height_cm', 170)
+                                weight = row.get('weight_kg', 70)
                                 bmi = weight / ((height/100) ** 2) if height > 0 else 0
                                 
                                 results.append({
@@ -945,26 +952,31 @@ with tab2:
                         st.session_state.batch_results = pd.DataFrame(results)
                     
                     # Display results
-                    success_df = st.session_state.batch_results[st.session_state.batch_results['Status'] == 'Success']
-                    st.success(f"✅ Analysis completed! Successful: {len(success_df)} / {len(results)}")
+                    st.success(f"✅ Analysis completed for {len(results)} records!")
                     
-                    if len(success_df) > 0:
-                        st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
-                        st.dataframe(st.session_state.batch_results, use_container_width=True)
-                        
-                        # Summary statistics
-                        col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-                        with col_s1:
-                            st.metric("Total Records", len(df))
-                        with col_s2:
-                            st.metric("Successful", len(success_df))
-                        with col_s3:
-                            st.metric("Failed", len(df) - len(success_df))
-                        with col_s4:
+                    # Results table
+                    st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
+                    st.dataframe(st.session_state.batch_results, use_container_width=True)
+                    
+                    # Summary statistics
+                    st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📈 Summary Statistics</h3>", unsafe_allow_html=True)
+                    
+                    success_df = st.session_state.batch_results[st.session_state.batch_results['Status'] == 'Success']
+                    
+                    col_s1, col_s2, col_s3, col_s4 = st.columns(4)
+                    with col_s1:
+                        st.metric("Total Records", len(df))
+                    with col_s2:
+                        st.metric("Successful", len(success_df))
+                    with col_s3:
+                        st.metric("Failed", len(df) - len(success_df))
+                    with col_s4:
+                        if len(success_df) > 0:
                             avg_jump = success_df['Predicted_Jump_CM'].mean()
                             st.metric("Avg Jump Distance", f"{avg_jump:.1f} cm")
-                        
-                        # Class distribution
+                    
+                    # Class distribution chart
+                    if len(success_df) > 0:
                         class_counts = success_df['Predicted_Class'].value_counts()
                         fig = px.pie(
                             values=class_counts.values,
@@ -975,26 +987,61 @@ with tab2:
                         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
                         st.plotly_chart(fig, use_container_width=True)
                         
-                        # Download results
+                        # Additional charts
+                        col_ch1, col_ch2 = st.columns(2)
+                        with col_ch1:
+                            # Jump distance histogram
+                            fig_hist = px.histogram(
+                                success_df, 
+                                x='Predicted_Jump_CM',
+                                title='Jump Distance Distribution',
+                                labels={'Predicted_Jump_CM': 'Jump Distance (cm)'},
+                                color_discrete_sequence=['#00f2ff']
+                            )
+                            fig_hist.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                            st.plotly_chart(fig_hist, use_container_width=True)
+                        
+                        with col_ch2:
+                            # BMI distribution
+                            fig_bmi = px.histogram(
+                                success_df,
+                                x='BMI',
+                                title='BMI Distribution',
+                                labels={'BMI': 'BMI Value'},
+                                color_discrete_sequence=['#ffaa44']
+                            )
+                            fig_bmi.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                            st.plotly_chart(fig_bmi, use_container_width=True)
+                    
+                    # Download results
+                    if len(success_df) > 0:
                         output = io.BytesIO()
                         file_extension = uploaded_file.name.split('.')[-1].lower()
                         
+                        # Create output file with same format as input
                         if file_extension == 'csv':
+                            # For CSV output
                             df_with_predictions = df.copy()
+                            # Add predictions to original data
                             predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
                             df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
                             df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
+                            
+                            # Save as CSV with UTF-8 encoding
                             df_with_predictions.to_csv(output, index=False, encoding='utf-8')
                             mime_type = "text/csv"
                             output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
                         else:
+                            # For Excel output
                             with pd.ExcelWriter(output, engine='openpyxl') as writer:
                                 st.session_state.batch_results.to_excel(writer, sheet_name='Analysis Results', index=False)
+                                # Add original data with predictions
                                 df_with_predictions = df.copy()
                                 predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
                                 df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
                                 df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
                                 df_with_predictions.to_excel(writer, sheet_name='Data with Predictions', index=False)
+                            
                             mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
                         
@@ -1006,18 +1053,12 @@ with tab2:
                             mime=mime_type,
                             use_container_width=True
                         )
-                    else:
-                        st.error("❌ No records were successfully analyzed. Please check your file format.")
-                        st.info("""
-                        **Required columns:** age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts
-                        
-                        **Gender format:** Use 0 for Male, 1 for Female (or M/F, Male/Female)
-                        """)
     
     else:
         st.info("📂 Upload an Excel or CSV file to begin batch analysis")
         
-        with st.expander("📝 View Required Format", expanded=False):
+        # Show example format for both file types
+        with st.expander("📝 View Required Format (Excel/CSV)", expanded=False):
             st.markdown("""
             ### Required Columns:
             | Column Name | Description | Example |
@@ -1034,10 +1075,17 @@ with tab2:
             | sit_ups_counts | Number of sit-ups | 45 |
             """)
             
-            st.markdown("### CSV Example:")
+            # Example data for CSV
+            st.markdown("### CSV Example (UTF-8):")
             st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
 25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
-30,1,165.3,65.4,22.0,75,115,38.2,12.5,38""", language='csv')
+30,1,165.3,65.4,22.0,75,115,38.2,12.5,38
+28,0,180.2,78.5,15.2,82,125,52.3,18.2,52""", language='csv')
+            
+            st.markdown("### Excel Example:")
+            st.markdown("Create an Excel file with the same column structure as shown above.")
+            
+            st.info("💡 **Tip for CSV files:** The system automatically detects file encoding (UTF-8, Latin-1, Windows-1256, etc.)")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
