@@ -59,17 +59,7 @@ with st.sidebar:
     """)
     st.divider()
     st.write("🔧 **الإصدار:** 2.0.0")
-    st.write("👤 *developers:
-    👨‍💻 Team Members
-Ahmed Shehta Zoghli
-
-Eslam TagElsir
-
-Osama Mohamed
-
-Mohamed Hassan
-
-Ahmed Ibrahim")
+    st.write("👤 *developers:👨‍💻 Team Members Ahmed Shehta Zoghli _ Eslam TagElsir _ Osama Mohamed _ Mohamed Hassan _ Ahmed Ibrahim")
 
 # --- الواجهة الرئيسية ---
 st.title("🏋️ نظام تحليل وتصنيف الأداء البدني الذكي")
