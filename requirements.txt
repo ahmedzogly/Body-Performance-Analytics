@@ -10,4 +10,3 @@ fpdf2
 reportlab
 fpdf
 chardet
-
