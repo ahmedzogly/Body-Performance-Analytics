@@ -288,6 +288,16 @@ st.markdown("""
     .stCode {
         font-size: 1.2rem !important;
     }
+    
+    /* File Uploader */
+    .stFileUploader {
+        font-size: 1.2rem !important;
+    }
+    
+    .stFileUploader label {
+        font-size: 1.4rem !important;
+        font-weight: 600 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -568,9 +578,30 @@ def load_assets():
     
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. BATCH ANALYSIS FUNCTION ---
+# --- 7. FILE PROCESSING FUNCTION (SUPPORTS BOTH EXCEL AND CSV) ---
+def process_uploaded_file(uploaded_file):
+    """Process uploaded file (Excel or CSV) and return DataFrame"""
+    file_extension = uploaded_file.name.split('.')[-1].lower()
+    
+    try:
+        if file_extension == 'csv':
+            df = pd.read_csv(uploaded_file)
+            st.success(f"✅ CSV file loaded successfully! Found {len(df)} records.")
+        elif file_extension in ['xlsx', 'xls']:
+            df = pd.read_excel(uploaded_file)
+            st.success(f"✅ Excel file loaded successfully! Found {len(df)} records.")
+        else:
+            st.error(f"Unsupported file format: {file_extension}")
+            return None
+        
+        return df
+    except Exception as e:
+        st.error(f"Error reading file: {str(e)}")
+        return None
+
+# --- 8. BATCH ANALYSIS FUNCTION ---
 def analyze_batch_data(df, scaler, clf, reg):
-    """Analyze batch data from uploaded Excel file"""
+    """Analyze batch data from uploaded file"""
     feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
@@ -579,18 +610,16 @@ def analyze_batch_data(df, scaler, clf, reg):
     for idx, row in df.iterrows():
         try:
             # Extract features
-            features = [
-                row.get('age', 0),
-                row.get('gender', 0),
-                row.get('height_cm', 0),
-                row.get('weight_kg', 0),
-                row.get('body_fat_pct', 0),
-                row.get('diastolic', 0),
-                row.get('systolic', 0),
-                row.get('gripForce', 0),
-                row.get('sit_bend_forward_cm', 0),
-                row.get('sit_ups_counts', 0)
-            ]
+            features = []
+            for col in feature_names:
+                if col in row:
+                    val = row[col]
+                    # Handle gender (convert M/F to 0/1 if needed)
+                    if col == 'gender' and isinstance(val, str):
+                        val = 0 if val.upper() in ['M', 'MALE', 'MALE'] else 1
+                    features.append(float(val) if pd.notna(val) else 0)
+                else:
+                    features.append(0)
             
             input_df = pd.DataFrame([features], columns=feature_names)
             scaled_data = scaler.transform(input_df)
@@ -603,24 +632,24 @@ def analyze_batch_data(df, scaler, clf, reg):
             bmi = weight / ((height/100) ** 2) if height > 0 else 0
             
             results.append({
-                'row_index': idx,
-                'predicted_class': p_class,
-                'predicted_jump_cm': p_jump,
-                'bmi': bmi,
-                'status': 'Success'
+                'Row_Index': idx,
+                'Predicted_Class': p_class,
+                'Predicted_Jump_CM': round(p_jump, 2),
+                'BMI': round(bmi, 2),
+                'Status': 'Success'
             })
         except Exception as e:
             results.append({
-                'row_index': idx,
-                'predicted_class': 'Error',
-                'predicted_jump_cm': 0,
-                'bmi': 0,
-                'status': f'Error: {str(e)[:50]}'
+                'Row_Index': idx,
+                'Predicted_Class': 'Error',
+                'Predicted_Jump_CM': 0,
+                'BMI': 0,
+                'Status': f'Error: {str(e)[:50]}'
             })
     
     return pd.DataFrame(results)
 
-# --- 8. SESSION STATE ---
+# --- 9. SESSION STATE ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
@@ -628,11 +657,11 @@ if 'last_analysis' not in st.session_state:
 if 'batch_results' not in st.session_state:
     st.session_state.batch_results = None
 
-# --- 9. MAIN INTERFACE ---
+# --- 10. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ BODY PERFORMANCE AI PRO ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
-# Create Tabs - NEW TAB FOR BATCH ANALYSIS
+# Create Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔬 SINGLE ANALYSIS", "📊 BATCH ANALYSIS", "📈 PERFORMANCE DASHBOARD", "📊 TREND ANALYTICS", "📚 RESOURCE LIBRARY"])
 
 # --- TAB 1: SINGLE ANALYSIS ---
@@ -767,24 +796,27 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (NEW) ---
+# --- TAB 2: BATCH ANALYSIS (SUPPORTS EXCEL AND CSV) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload an Excel file with the same format as the training data for batch analysis</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload an Excel (.xlsx, .xls) or CSV file with the same format as the training data for batch analysis</p>", unsafe_allow_html=True)
     
-    # File upload
+    # File upload with multiple format support
     uploaded_file = st.file_uploader(
-        "📁 Upload Excel File (.xlsx, .xls)",
-        type=['xlsx', 'xls'],
-        help="Upload a file with columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts"
+        "📁 Upload File (CSV, Excel)",
+        type=['csv', 'xlsx', 'xls'],
+        help="Upload CSV or Excel file with columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts"
     )
     
     if uploaded_file is not None:
-        try:
-            # Read Excel file
-            df = pd.read_excel(uploaded_file)
-            st.success(f"✅ File loaded successfully! Found {len(df)} records.")
+        # Process the uploaded file
+        df = process_uploaded_file(uploaded_file)
+        
+        if df is not None:
+            # Display file info
+            file_extension = uploaded_file.name.split('.')[-1].upper()
+            st.info(f"📄 File Type: {file_extension} | Rows: {len(df)} | Columns: {len(df.columns)}")
             
             # Display first few rows
             with st.expander("📋 Preview Uploaded Data", expanded=True):
@@ -798,7 +830,7 @@ with tab2:
             missing_cols = [col for col in required_cols if col not in df.columns]
             if missing_cols:
                 st.warning(f"⚠️ Missing columns: {missing_cols}")
-                st.info("Please ensure your file contains the required columns. The system will attempt to use available data.")
+                st.info("The system will attempt to use available data. Missing columns will be filled with 0.")
             
             # Analyze button
             if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
@@ -824,7 +856,7 @@ with tab2:
                                         val = row[col]
                                         # Handle gender (convert M/F to 0/1 if needed)
                                         if col == 'gender' and isinstance(val, str):
-                                            val = 0 if val.upper() in ['M', 'MALE'] else 1
+                                            val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
                                         features.append(float(val) if pd.notna(val) else 0)
                                     else:
                                         features.append(0)
@@ -840,7 +872,7 @@ with tab2:
                                 bmi = weight / ((height/100) ** 2) if height > 0 else 0
                                 
                                 results.append({
-                                    'Index': idx,
+                                    'Row_Index': idx,
                                     'Predicted_Class': p_class,
                                     'Predicted_Jump_CM': round(p_jump, 2),
                                     'BMI': round(bmi, 2),
@@ -848,7 +880,7 @@ with tab2:
                                 })
                             except Exception as e:
                                 results.append({
-                                    'Index': idx,
+                                    'Row_Index': idx,
                                     'Predicted_Class': 'Error',
                                     'Predicted_Jump_CM': 0,
                                     'BMI': 0,
@@ -893,50 +925,104 @@ with tab2:
                         )
                         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
                         st.plotly_chart(fig, use_container_width=True)
+                        
+                        # Additional charts
+                        col_ch1, col_ch2 = st.columns(2)
+                        with col_ch1:
+                            # Jump distance histogram
+                            fig_hist = px.histogram(
+                                success_df, 
+                                x='Predicted_Jump_CM',
+                                title='Jump Distance Distribution',
+                                labels={'Predicted_Jump_CM': 'Jump Distance (cm)'},
+                                color_discrete_sequence=['#00f2ff']
+                            )
+                            fig_hist.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                            st.plotly_chart(fig_hist, use_container_width=True)
+                        
+                        with col_ch2:
+                            # BMI distribution
+                            fig_bmi = px.histogram(
+                                success_df,
+                                x='BMI',
+                                title='BMI Distribution',
+                                labels={'BMI': 'BMI Value'},
+                                color_discrete_sequence=['#ffaa44']
+                            )
+                            fig_bmi.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                            st.plotly_chart(fig_bmi, use_container_width=True)
                     
                     # Download results
                     if len(success_df) > 0:
                         output = io.BytesIO()
-                        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                            st.session_state.batch_results.to_excel(writer, sheet_name='Analysis Results', index=False)
-                            # Add original data with predictions
+                        file_extension = uploaded_file.name.split('.')[-1].lower()
+                        
+                        # Create output file with same format as input
+                        if file_extension == 'csv':
+                            # For CSV output
                             df_with_predictions = df.copy()
-                            df_with_predictions['Predicted_Class'] = success_df.set_index('Index')['Predicted_Class'].reindex(df.index).fillna('Error')
-                            df_with_predictions['Predicted_Jump_CM'] = success_df.set_index('Index')['Predicted_Jump_CM'].reindex(df.index).fillna(0)
-                            df_with_predictions.to_excel(writer, sheet_name='Data with Predictions', index=False)
+                            # Add predictions to original data
+                            predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
+                            df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
+                            df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
+                            
+                            # Save as CSV
+                            df_with_predictions.to_csv(output, index=False)
+                            mime_type = "text/csv"
+                            output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+                        else:
+                            # For Excel output
+                            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                                st.session_state.batch_results.to_excel(writer, sheet_name='Analysis Results', index=False)
+                                # Add original data with predictions
+                                df_with_predictions = df.copy()
+                                predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
+                                df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
+                                df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
+                                df_with_predictions.to_excel(writer, sheet_name='Data with Predictions', index=False)
+                            
+                            mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
                         
                         output.seek(0)
                         st.download_button(
-                            label="📥 DOWNLOAD RESULTS (Excel)",
+                            label="📥 DOWNLOAD RESULTS",
                             data=output,
-                            file_name=f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            file_name=output_filename,
+                            mime=mime_type,
                             use_container_width=True
                         )
-                    
-        except Exception as e:
-            st.error(f"Error reading file: {str(e)}")
-            st.info("Please ensure the file is a valid Excel file with the correct format.")
     
     else:
-        st.info("📂 Upload an Excel file to begin batch analysis")
-        st.markdown("""
-        <div style="margin-top: 20px; padding: 20px; background: rgba(0,242,255,0.1); border-radius: 10px;">
-            <h4 style="color:#00f2ff;">Required Columns:</h4>
-            <ul style="color: #94a3b8;">
-                <li>age - Age in years</li>
-                <li>gender - 0 for Male, 1 for Female</li>
-                <li>height_cm - Height in centimeters</li>
-                <li>weight_kg - Weight in kilograms</li>
-                <li>body_fat_pct - Body fat percentage</li>
-                <li>diastolic - Diastolic blood pressure</li>
-                <li>systolic - Systolic blood pressure</li>
-                <li>gripForce - Grip strength in kg</li>
-                <li>sit_bend_forward_cm - Flexibility measurement</li>
-                <li>sit_ups_counts - Number of sit-ups</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        st.info("📂 Upload an Excel or CSV file to begin batch analysis")
+        
+        # Show example format for both file types
+        with st.expander("📝 View Required Format (Excel/CSV)", expanded=False):
+            st.markdown("""
+            ### Required Columns:
+            | Column Name | Description | Example |
+            |------------|-------------|---------|
+            | age | Age in years | 25 |
+            | gender | 0 for Male, 1 for Female | 0 |
+            | height_cm | Height in centimeters | 175.5 |
+            | weight_kg | Weight in kilograms | 70.2 |
+            | body_fat_pct | Body fat percentage | 18.5 |
+            | diastolic | Diastolic blood pressure | 80 |
+            | systolic | Systolic blood pressure | 120 |
+            | gripForce | Grip strength in kg | 45.5 |
+            | sit_bend_forward_cm | Flexibility measurement | 15.3 |
+            | sit_ups_counts | Number of sit-ups | 45 |
+            """)
+            
+            # Example data for CSV
+            st.markdown("### CSV Example:")
+            st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
+25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
+30,1,165.3,65.4,22.0,75,115,38.2,12.5,38
+28,0,180.2,78.5,15.2,82,125,52.3,18.2,52""", language='csv')
+            
+            st.markdown("### Excel Example:")
+            st.markdown("Create an Excel file with the same column structure as shown above.")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1090,10 +1176,10 @@ with tab5:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 10. FOOTER ---
+# --- 11. FOOTER ---
 st.markdown("""
 <div class='footer'>
-    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis Available</p>
+    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis (CSV/Excel)</p>
     <p>© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
     <p>Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
 </div>
