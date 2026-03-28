@@ -1,12 +1,53 @@
-🏋️ Body Performance Analytics & Intelligent ClassificationAn end-to-end Machine Learning system designed to assess physical fitness levels and predict athletic performance based on biometric and physiological data. This project covers the full data science lifecycle: from Exploratory Data Analysis (EDA) to Model Deployment.📌 Project OverviewThe objective is to leverage data-driven insights to classify individuals into four performance categories (A, B, C, D) and predict quantitative metrics like "Broad Jump Distance." This system can be integrated into health apps or used by fitness trainers to provide objective, automated assessments.Key Features:Dual-Task Modeling: Supports both Classification (Fitness Grade) and Regression (Broad Jump Prediction).Data Integrity: Implements a robust preprocessing pipeline to handle outliers and data quality violations.Interactive Dashboard: A live web application built with Streamlit for real-time predictions.📊 Dataset InsightsThe model was trained on a dataset of 13,392 records with 12 key attributes, including:Biometrics: Age, Gender, Height, Weight, Body Fat %.Health Metrics: Systolic/Diastolic Blood Pressure.Performance Tests: Grip Strength, Sit & Bend (Flexibility), Sit-ups (Endurance), Broad Jump.⚙️ Model Architecture & PerformanceWe evaluated multiple algorithms, including SVM, Random Forest, and Linear Regression, to find the optimal balance between accuracy and interpretability.TaskBest ModelPerformance MetricClassificationNeural Network (MLP)74.65% AccuracyRegressionLinear Regression / MLP0.79 $R^2$ ScoreClassification Strategy: The Multi-Layer Perceptron (MLP) was selected for its ability to learn complex non-linear boundaries between fitness classes.Regression Strategy: Linear Regression is recommended for deployment due to its high interpretability for coaches and athletes.🚀 Installation & Usage1. Clone the repositoryBashgit clone https://github.com/YourUsername/Body-Performance-Analytics.git
-cd Body-Performance-Analytics
-2. Install DependenciesBashpip install -r requirements.txt
-3. Run the Web App LocallyBashstreamlit run app.py
-🛠️ Tech StackLanguage: PythonData Handling: Pandas, NumPyVisualization: Matplotlib, SeabornMachine Learning: Scikit-Learn, JoblibDeployment: Streamlit Cloud📂 Project StructurePlaintext├── data/                    # Original and cleaned datasets
-├── notebooks/               # Jupyter notebooks (EDA & Modeling)
-├── app.py                   # Streamlit application source code
-├── classifier_model.pkl      # Saved Neural Network for classification
-├── regression_model.pkl      # Saved model for jump prediction
-├── scaler.pkl               # Fitted MinMaxScaler for input normalization
-└── README.md                # Project documentation
-👥 Team MembersAhmed Shehta Zoghli - (Graduate Accountant & Data Analyst)Eslam TagElsir, Osama Mohamed, Mohamed Hassan, Ahmed IbrahimDeveloped as part of the Introduction to AI and ML Course Project | March 2026
+# 🏋️ Body Performance Analytics & Intelligent Classification System
+
+![Python](https://img.shields.io/badge/Python-3.9+-blue?style=for-the-badge&logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit)
+![Scikit-Learn](https://img.shields.io/badge/Machine%20Learning-Scikit--Learn-orange?style=for-the-badge&logo=scikit-learn)
+
+An end-to-end Machine Learning solution that transforms biometric and physical data into actionable fitness insights. This project implements a dual-model approach: **Classifying** individuals into fitness grades and **Predicting** athletic explosive power (Broad Jump) through regression.
+
+---
+
+## 📌 Project Overview
+The "Body Performance" project follows the complete Data Science lifecycle to solve two primary problems:
+1.  **Multi-Class Classification:** Assigning an individual to one of four performance categories (**A, B, C, D**) based on their physical metrics.
+2.  **Regression Analysis:** Estimating the **Broad Jump distance (cm)**, a key indicator of lower-body explosive strength.
+
+### Key Highlights
+* **Dataset:** 13,392 records with 12 physiological and performance features.
+* **Best Classifier:** Neural Network (MLP) achieving **74.65% accuracy**.
+* **Best Regressor:** Linear Regression achieving an **R² score of 0.79**.
+* **Deployment:** Live interactive dashboard built with **Streamlit**.
+![licensed-image](https://github.com/user-attachments/assets/c7e6e26e-e2dd-4017-96a2-dce3ec6e1918)
+
+---
+
+## 📊 The Data Science Pipeline
+
+### 1. Data Cleaning & Preparation
+* Handled data quality violations and removed duplicate records.
+* Feature engineering: Standardized units and encoded categorical variables (Gender).
+* **Scaling:** Applied `MinMaxScaler` to normalize features for Neural Network sensitivity.
+
+### 2. Exploratory Data Analysis (EDA)
+* **Balanced Classes:** Verified that the four grades (A-D) are evenly distributed (~25% each).
+* **Correlation Analysis:** Discovered that **Flexibility (Sit & Bend)** and **Core Endurance (Sit-ups)** are the strongest predictors of overall fitness grades.
+
+### 3. Modeling & Evaluation
+We compared several models including SVM, Random Forest, Naive Bayes, and Neural Networks.
+* **Classification:** The **MLP (128, 64 nodes)** outperformed others by effectively capturing non-linear relationships in the biometric data.
+* **Regression:** While SVR performed well, **Linear Regression** was chosen for deployment due to its high interpretability—allowing coaches to see exactly how much each feature impacts performance.
+
+---
+
+## 🚀 Installation & Local Usage
+
+### Prerequisites
+* Python 3.9 or higher
+* Git
+
+### Setup
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YourUsername/Body-Performance-Analytics.git](https://github.com/YourUsername/Body-Performance-Analytics.git)
+   cd Body-Performance-Analytics
