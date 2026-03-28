@@ -1,26 +1,12 @@
-# 🏋️ Body Performance Analytics System
-
-نظام ذكي يعتمد على تعلم الآلة لتصنيف مستوى اللياقة البدنية والتنبؤ بقوة الأداء بناءً على المؤشرات الحيوية.
-
-## 📌 عن المشروع
-يهدف هذا المشروع إلى تحويل البيانات الصحية الخام إلى رؤى قابلة للتنفيذ باستخدام:
-- **التصنيف:** التنبؤ بفئة الأداء (A, B, C, D) باستخدام الشبكات العصبية (MLP).
-- **الانحدار:** التنبؤ بمسافة القفز الطويل باستخدام Linear Regression.
-
-## 🚀 كيفية تشغيل التطبيق
-يمكنك تجربة النسخة الحية من التطبيق عبر الرابط التالي:
-[ضع رابط Streamlit هنا بعد الانتهاء]
-
-أو تشغيله محلياً:
-1. install requirements: `pip install -r requirements.txt`
-2. run app: `streamlit run app.py`
-
-## 📊 البيانات المستخدمة
-يحتوي النظام على بيانات لـ 13,393 شخص، تشمل:
-- العمر، الطول، الوزن، نسبة الدهون.
-- ضغط الدم، قوة القبضة، المرونة، وتمارين البطن.
-
-## 🛠️ التقنيات المستخدمة
-- **Python** (Pandas, Scikit-Learn)
-- **Streamlit** (لواجهة المستخدم)
-- **Joblib** (لحفظ النماذج)
+🏋️ Body Performance Analytics & Intelligent ClassificationAn end-to-end Machine Learning system designed to assess physical fitness levels and predict athletic performance based on biometric and physiological data. This project covers the full data science lifecycle: from Exploratory Data Analysis (EDA) to Model Deployment.📌 Project OverviewThe objective is to leverage data-driven insights to classify individuals into four performance categories (A, B, C, D) and predict quantitative metrics like "Broad Jump Distance." This system can be integrated into health apps or used by fitness trainers to provide objective, automated assessments.Key Features:Dual-Task Modeling: Supports both Classification (Fitness Grade) and Regression (Broad Jump Prediction).Data Integrity: Implements a robust preprocessing pipeline to handle outliers and data quality violations.Interactive Dashboard: A live web application built with Streamlit for real-time predictions.📊 Dataset InsightsThe model was trained on a dataset of 13,392 records with 12 key attributes, including:Biometrics: Age, Gender, Height, Weight, Body Fat %.Health Metrics: Systolic/Diastolic Blood Pressure.Performance Tests: Grip Strength, Sit & Bend (Flexibility), Sit-ups (Endurance), Broad Jump.⚙️ Model Architecture & PerformanceWe evaluated multiple algorithms, including SVM, Random Forest, and Linear Regression, to find the optimal balance between accuracy and interpretability.TaskBest ModelPerformance MetricClassificationNeural Network (MLP)74.65% AccuracyRegressionLinear Regression / MLP0.79 $R^2$ ScoreClassification Strategy: The Multi-Layer Perceptron (MLP) was selected for its ability to learn complex non-linear boundaries between fitness classes.Regression Strategy: Linear Regression is recommended for deployment due to its high interpretability for coaches and athletes.🚀 Installation & Usage1. Clone the repositoryBashgit clone https://github.com/YourUsername/Body-Performance-Analytics.git
+cd Body-Performance-Analytics
+2. Install DependenciesBashpip install -r requirements.txt
+3. Run the Web App LocallyBashstreamlit run app.py
+🛠️ Tech StackLanguage: PythonData Handling: Pandas, NumPyVisualization: Matplotlib, SeabornMachine Learning: Scikit-Learn, JoblibDeployment: Streamlit Cloud📂 Project StructurePlaintext├── data/                    # Original and cleaned datasets
+├── notebooks/               # Jupyter notebooks (EDA & Modeling)
+├── app.py                   # Streamlit application source code
+├── classifier_model.pkl      # Saved Neural Network for classification
+├── regression_model.pkl      # Saved model for jump prediction
+├── scaler.pkl               # Fitted MinMaxScaler for input normalization
+└── README.md                # Project documentation
+👥 Team MembersAhmed Shehta Zoghli - (Graduate Accountant & Data Analyst)Eslam TagElsir, Osama Mohamed, Mohamed Hassan, Ahmed IbrahimDeveloped as part of the Introduction to AI and ML Course Project | March 2026
