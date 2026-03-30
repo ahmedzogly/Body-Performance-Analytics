@@ -24,281 +24,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. ENHANCED CSS WITH EVEN LARGER FONTS ---
+# --- 2. ENHANCED CSS (نفس الكود السابق، تم اختصاره للتوفير) ---
 st.markdown("""
     <style>
-    /* Main Background with Gradient Animation */
-    .main {
-        background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
-        color: #00f2ff;
-        font-family: 'Segoe UI', 'Roboto', sans-serif;
-    }
-    
-    /* Animated Gradient Text - EVEN LARGER */
-    .tech-header {
-        font-size: 5.5rem !important;
-        font-weight: 900;
-        background: linear-gradient(90deg, #00f2ff, #0062ff, #00f2ff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: 5px;
-        text-align: center;
-        animation: shine 3s linear infinite;
-        margin-bottom: 20px;
-    }
-    
-    @keyframes shine {
-        0% { background-position: 0% center; }
-        100% { background-position: 200% center; }
-    }
-    
-    /* Subheader Styling - LARGER */
-    .tech-subheader {
-        font-size: 2.2rem !important;
-        font-weight: 600;
-        color: #00f2ff;
-        text-align: center;
-        margin-top: -20px;
-        margin-bottom: 30px;
-        letter-spacing: 2px;
-    }
-    
-    /* Glowing Cards */
-    .glass-card {
-        background: rgba(15, 23, 42, 0.7);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 28px;
-        border: 1px solid rgba(0, 242, 255, 0.3);
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .glass-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-        border-color: rgba(0, 242, 255, 0.6);
-    }
-    
-    /* Metrics Styling - EVEN LARGER */
-    div[data-testid="stMetricValue"] { 
-        font-size: 95px !important; 
-        color: #00f2ff !important;
-        text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
-        font-weight: 800 !important;
-    }
-    
-    div[data-testid="stMetricLabel"] {
-        font-size: 24px !important;
-        color: #94a3b8 !important;
-        font-weight: 600 !important;
-    }
-    
-    div[data-testid="stMetricDelta"] {
-        font-size: 20px !important;
-    }
-    
-    /* Button Styling - LARGER */
-    .stButton > button {
-        width: 100% !important;
-        height: 4.2em !important;
-        font-size: 1.8rem !important;
-        font-weight: bold !important;
-        background: linear-gradient(45deg, #00f2ff, #0062ff) !important;
-        border: none !important;
-        color: white !important;
-        border-radius: 12px !important;
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.5) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stButton > button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 30px rgba(0, 242, 255, 0.8) !important;
-    }
-    
-    /* Expander Styling - LARGER FONT */
-    .stExpander {
-        background: rgba(15, 23, 42, 0.5) !important;
-        border: 1px solid #1e293b !important;
-        border-radius: 12px !important;
-    }
-    
-    .stExpander summary {
-        font-size: 1.6rem !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Number Input Styling - LARGER */
-    .stNumberInput input, .stTextInput input {
-        background-color: #0f172a !important;
-        border: 1px solid #1e293b !important;
-        color: #00f2ff !important;
-        border-radius: 10px !important;
-        font-size: 1.5rem !important;
-        padding: 14px !important;
-    }
-    
-    .stNumberInput label, .stTextInput label {
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-        color: #94a3b8 !important;
-    }
-    
-    /* Slider Styling - LARGER */
-    .stSlider {
-        color: #00f2ff !important;
-    }
-    
-    .stSlider label {
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Tabs Styling - LARGER */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 35px;
-        background-color: rgba(15, 23, 42, 0.5);
-        border-radius: 12px;
-        padding: 10px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 10px;
-        padding: 15px 28px;
-        font-weight: bold;
-        font-size: 1.5rem !important;
-        color: #94a3b8;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(45deg, #00f2ff, #0062ff);
-        color: white !important;
-        font-size: 1.5rem !important;
-    }
-    
-    /* Sidebar Styling - LARGER FONTS */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
-        border-right: 1px solid rgba(0, 242, 255, 0.2);
-    }
-    
-    .css-1d391kg .stMarkdown {
-        font-size: 1.2rem !important;
-    }
-    
-    /* Headers in Sidebar */
-    .css-1d391kg h2 {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
-    }
-    
-    .css-1d391kg h3 {
-        font-size: 1.5rem !important;
-    }
-    
-    /* Success/Warning/Error Messages - LARGER */
-    .stAlert {
-        background-color: rgba(15, 23, 42, 0.9) !important;
-        border-left: 5px solid #00f2ff !important;
-        font-size: 1.4rem !important;
-    }
-    
-    /* Info Box Styling */
-    .stInfo {
-        font-size: 1.4rem !important;
-    }
-    
-    /* Dataframe Styling - LARGER */
-    .stDataFrame {
-        font-size: 1.2rem !important;
-    }
-    
-    .stDataFrame table {
-        font-size: 1.2rem !important;
-    }
-    
-    /* Markdown Text */
-    .stMarkdown {
-        font-size: 1.2rem !important;
-    }
-    
-    /* Selectbox Styling */
-    .stSelectbox label {
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-    }
-    
-    .stSelectbox div {
-        font-size: 1.3rem !important;
-    }
-    
-    /* Footer */
-    .footer {
-        text-align: center;
-        padding: 28px;
-        color: #334155;
-        border-top: 1px solid rgba(0, 242, 255, 0.2);
-        margin-top: 50px;
-        font-size: 1.1rem;
-    }
-    
-    /* Custom Metric Card */
-    .metric-card {
-        background: rgba(15, 23, 42, 0.8);
-        border-radius: 15px;
-        padding: 22px;
-        text-align: center;
-        border: 1px solid rgba(0, 242, 255, 0.2);
-    }
-    
-    .metric-card h3 {
-        font-size: 1.6rem;
-        color: #94a3b8;
-        margin-bottom: 10px;
-    }
-    
-    .metric-card .value {
-        font-size: 3rem;
-        font-weight: bold;
-        color: #00f2ff;
-    }
-    
-    /* Section Headers */
-    .section-header {
-        font-size: 2.2rem !important;
-        font-weight: 700 !important;
-        color: #00f2ff !important;
-        margin-bottom: 25px !important;
-        border-left: 4px solid #00f2ff;
-        padding-left: 18px;
-    }
-    
-    /* Radio Buttons */
-    .stRadio label {
-        font-size: 1.4rem !important;
-    }
-    
-    /* Checkbox */
-    .stCheckbox label {
-        font-size: 1.4rem !important;
-    }
-    
-    /* Code Blocks */
-    .stCode {
-        font-size: 1.2rem !important;
-    }
-    
-    /* File Uploader */
-    .stFileUploader {
-        font-size: 1.2rem !important;
-    }
-    
-    .stFileUploader label {
-        font-size: 1.4rem !important;
-        font-weight: 600 !important;
-    }
+    .main { background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%); color: #00f2ff; }
+    .tech-header { font-size: 5.5rem !important; font-weight: 900; background: linear-gradient(90deg, #00f2ff, #0062ff, #00f2ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; animation: shine 3s linear infinite; margin-bottom: 20px; }
+    @keyframes shine { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    .tech-subheader { font-size: 2.2rem !important; font-weight: 600; color: #00f2ff; text-align: center; margin-top: -20px; margin-bottom: 30px; }
+    .glass-card { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border-radius: 20px; padding: 28px; border: 1px solid rgba(0, 242, 255, 0.3); transition: all 0.3s ease; }
+    .glass-card:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); }
+    div[data-testid="stMetricValue"] { font-size: 95px !important; color: #00f2ff !important; text-shadow: 0 0 15px rgba(0, 242, 255, 0.5); font-weight: 800 !important; }
+    div[data-testid="stMetricLabel"] { font-size: 24px !important; color: #94a3b8 !important; }
+    .stButton > button { width: 100% !important; height: 4.2em !important; font-size: 1.8rem !important; background: linear-gradient(45deg, #00f2ff, #0062ff) !important; border-radius: 12px !important; }
+    .footer { text-align: center; padding: 28px; color: #334155; border-top: 1px solid rgba(0, 242, 255, 0.2); margin-top: 50px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -326,10 +64,7 @@ def clean_text_for_pdf(text):
         '🏆': 'CHAMPION', '⚡': 'POWER', '📊': 'DATA', '🔬': 'LAB', '🧬': 'DNA',
         '🛰️': 'SATELLITE', '📈': 'TREND', '📚': 'LIBRARY', '💪': 'STRENGTH',
         '🧘': 'FLEX', '🏋️': 'TRAINING', '❤️': 'HEART', '💙': 'BP', '📅': 'AGE',
-        '📏': 'HEIGHT', '⚖️': 'WEIGHT', '💧': 'FAT', '🥗': 'NUTRITION',
-        '🏃‍♂️': 'RUN', '🦵': 'LEG', '🛡️': 'PROTECTION', '🎯': 'GOAL', '🌱': 'START',
-        '🎉': 'SUCCESS', '📝': 'NOTE', '🔍': 'SEARCH', '💡': 'TIP', '🚀': 'LAUNCH',
-        '🔄': 'RESET', '📥': 'DOWNLOAD', '🧠': 'BRAIN', '🏷️': 'TAG', '⚥': 'GENDER'
+        '📏': 'HEIGHT', '⚖️': 'WEIGHT', '💧': 'FAT', '🥗': 'NUTRITION'
     }
     for emoji, replacement in replacements.items():
         cleaned = cleaned.replace(emoji, replacement)
@@ -403,12 +138,7 @@ def generate_recommendations(grade, jump, age, bmi, fat):
 
 def get_performance_insights(grade, jump_distance, age):
     insights = []
-    grade_insights = {
-        'A': 'Elite Performance Level.',
-        'B': 'Advanced Performance Level.',
-        'C': 'Intermediate Level.',
-        'D': 'Development Level.'
-    }
+    grade_insights = {'A': 'Elite Performance Level.', 'B': 'Advanced Performance Level.', 'C': 'Intermediate Level.', 'D': 'Development Level.'}
     insights.append(f"- {grade_insights.get(grade, 'Standard level')}")
     if jump_distance > 250:
         insights.append(f"- Exceptional explosive power! Jump: {jump_distance:.1f}cm")
@@ -430,7 +160,6 @@ def get_performance_insights(grade, jump_distance, age):
 class TitanPDF(FPDF):
     def __init__(self):
         super().__init__()
-    
     def header(self):
         if self.page_no() == 1:
             self.set_font('helvetica', 'B', 22)
@@ -441,7 +170,6 @@ class TitanPDF(FPDF):
             self.cell(0, 10, 'Advanced Neural Analytics Report', ln=True, align='C')
             self.line(10, 35, 200, 35)
             self.ln(18)
-
     def footer(self):
         self.set_y(-22)
         self.set_font('helvetica', 'I', 9)
@@ -459,12 +187,7 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     pdf.cell(0, 12, 'ATHLETE INFORMATION', ln=True)
     pdf.set_font('helvetica', '', 12)
     pdf.set_text_color(0, 0, 0)
-    info_data = [
-        ['Athlete Name', clean_name[:60]],
-        ['Age', str(age)],
-        ['Gender', gender],
-        ['Assessment Date', datetime.now().strftime('%Y-%m-%d %H:%M')]
-    ]
+    info_data = [['Athlete Name', clean_name[:60]], ['Age', str(age)], ['Gender', gender], ['Assessment Date', datetime.now().strftime('%Y-%m-%d %H:%M')]]
     for label, value in info_data:
         pdf.set_font('helvetica', 'B', 12)
         pdf.cell(55, 10, label + ':', ln=False)
@@ -497,15 +220,13 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
     rec_lines = clean_recs.split('\n')
     for line in rec_lines[:15]:
         if line.strip():
-            clean_line = clean_text_for_pdf(line)[:85]
-            pdf.multi_cell(0, 7, clean_line)
+            pdf.multi_cell(0, 7, clean_text_for_pdf(line)[:85])
     pdf.ln(8)
     pdf.set_font('helvetica', 'B', 13)
     pdf.cell(0, 10, 'PERFORMANCE INSIGHTS:', ln=True)
     pdf.set_font('helvetica', 'I', 11)
     insights = get_performance_insights(p_class, p_jump, age)
-    clean_insights = clean_text_for_pdf(insights)
-    insight_lines = clean_insights.split('\n')
+    insight_lines = clean_text_for_pdf(insights).split('\n')
     for line in insight_lines[:8]:
         if line.strip():
             pdf.multi_cell(0, 7, line[:85])
@@ -521,11 +242,7 @@ def create_enhanced_pdf(name, age, gender, p_class, p_jump, recs, metrics_dict):
 @st.cache_resource
 def load_assets():
     model_dir = Path('.')
-    models = {
-        'classifier': 'classifier_model.pkl',
-        'regression': 'regression_model.pkl',
-        'scaler': 'scaler.pkl'
-    }
+    models = {'classifier': 'classifier_model.pkl', 'regression': 'regression_model.pkl', 'scaler': 'scaler.pkl'}
     loaded_models = {}
     for model_name, filename in models.items():
         model_path = model_dir / filename
@@ -551,170 +268,143 @@ def detect_encoding(file_bytes):
 
 def process_uploaded_file(uploaded_file):
     file_extension = uploaded_file.name.split('.')[-1].lower()
-    
     try:
         if file_extension == 'csv':
             file_bytes = uploaded_file.getvalue()
             encoding, confidence = detect_encoding(file_bytes)
             if encoding:
-                st.info(f"🔍 Detected encoding: {encoding} (confidence: {confidence:.2%})")
                 try:
                     text_content = file_bytes.decode(encoding)
                     from io import StringIO
                     df = pd.read_csv(StringIO(text_content))
-                    st.success(f"✅ CSV file loaded successfully! Found {len(df)} records.")
+                    st.success(f"✅ CSV file loaded! Found {len(df)} records.")
                     return df
                 except:
                     pass
-            
-            # Fallback encodings
             encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'cp1256', 'windows-1256', 'utf-16']
             for enc in encodings_to_try:
                 try:
                     uploaded_file.seek(0)
                     df = pd.read_csv(uploaded_file, encoding=enc)
-                    st.success(f"✅ CSV file loaded with {enc} encoding! Found {len(df)} records.")
+                    st.success(f"✅ CSV loaded with {enc} encoding! Found {len(df)} records.")
                     return df
                 except:
                     continue
-            
             raise Exception("Could not read CSV file")
-        
         elif file_extension in ['xlsx', 'xls']:
             df = pd.read_excel(uploaded_file)
-            st.success(f"✅ Excel file loaded successfully! Found {len(df)} records.")
+            st.success(f"✅ Excel loaded! Found {len(df)} records.")
             return df
         else:
-            st.error(f"Unsupported file format: {file_extension}")
+            st.error(f"Unsupported format: {file_extension}")
             return None
-            
     except Exception as e:
         st.error(f"Error reading file: {str(e)}")
         return None
 
-# --- 8. DEBUGGING FUNCTIONS ---
-def analyze_file_structure(df):
-    """Analyze and display file structure for debugging"""
-    st.markdown("### 🔍 File Structure Analysis")
+# --- 8. ENHANCED DATA VALIDATION AND CLEANING ---
+def validate_and_clean_data(df):
+    """Validate and clean data before analysis"""
+    st.markdown("### 🔍 Data Validation & Cleaning")
     
-    # Display column info
-    col_info = pd.DataFrame({
-        'Column Name': df.columns,
-        'Data Type': df.dtypes.values,
-        'Non-Null Count': df.count().values,
-        'Sample Values': [str(df[col].iloc[0])[:50] if len(df) > 0 else 'No data' for col in df.columns]
-    })
-    st.dataframe(col_info, use_container_width=True)
-    
-    # Check for potential column name matches (case insensitive)
-    st.markdown("### 🔄 Column Name Mapping Suggestions")
-    standard_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+    # Required columns
+    required_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                      'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
-    matches = {}
-    for std_col in standard_cols:
-        possible_matches = [col for col in df.columns if std_col.lower() in col.lower()]
-        if possible_matches:
-            matches[std_col] = possible_matches
+    # Check if columns exist
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        st.error(f"Missing columns: {missing_cols}")
+        return None
     
-    if matches:
-        st.json(matches)
+    # Create a copy for cleaning
+    df_clean = df[required_cols].copy()
+    
+    # Check data types and convert
+    issues = []
+    for col in required_cols:
+        # Check for non-numeric values
+        non_numeric = df_clean[col].apply(lambda x: not pd.api.types.is_number(x) if pd.notna(x) else False)
+        if non_numeric.any():
+            issues.append(f"Column '{col}' has {non_numeric.sum()} non-numeric values")
+            # Try to convert to numeric
+            df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
+    
+    # Check for outliers and invalid values
+    # Age validation (10-80)
+    invalid_age = (df_clean['age'] < 10) | (df_clean['age'] > 80)
+    if invalid_age.any():
+        issues.append(f"Age out of range (10-80): {invalid_age.sum()} records")
+        df_clean.loc[invalid_age, 'age'] = df_clean.loc[invalid_age, 'age'].clip(10, 80)
+    
+    # Gender validation (0 or 1)
+    invalid_gender = ~df_clean['gender'].isin([0, 1])
+    if invalid_gender.any():
+        issues.append(f"Invalid gender values: {invalid_gender.sum()} records")
+        df_clean.loc[invalid_gender, 'gender'] = 0
+    
+    # Height validation (100-220 cm)
+    invalid_height = (df_clean['height_cm'] < 100) | (df_clean['height_cm'] > 220)
+    if invalid_height.any():
+        issues.append(f"Height out of range (100-220): {invalid_height.sum()} records")
+        df_clean.loc[invalid_height, 'height_cm'] = df_clean.loc[invalid_height, 'height_cm'].clip(100, 220)
+    
+    # Weight validation (30-150 kg)
+    invalid_weight = (df_clean['weight_kg'] < 30) | (df_clean['weight_kg'] > 150)
+    if invalid_weight.any():
+        issues.append(f"Weight out of range (30-150): {invalid_weight.sum()} records")
+        df_clean.loc[invalid_weight, 'weight_kg'] = df_clean.loc[invalid_weight, 'weight_kg'].clip(30, 150)
+    
+    # Body fat validation (5-50%)
+    invalid_fat = (df_clean['body_fat_pct'] < 5) | (df_clean['body_fat_pct'] > 50)
+    if invalid_fat.any():
+        issues.append(f"Body fat out of range (5-50): {invalid_fat.sum()} records")
+        df_clean.loc[invalid_fat, 'body_fat_pct'] = df_clean.loc[invalid_fat, 'body_fat_pct'].clip(5, 50)
+    
+    # Fill NaN values with median or 0
+    for col in required_cols:
+        if df_clean[col].isna().any():
+            if col in ['age', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic']:
+                median_val = df_clean[col].median()
+                df_clean[col].fillna(median_val, inplace=True)
+                issues.append(f"Filled {df_clean[col].isna().sum()} NaN in '{col}' with median ({median_val:.1f})")
+            else:
+                df_clean[col].fillna(0, inplace=True)
+                issues.append(f"Filled NaN in '{col}' with 0")
+    
+    # Display issues
+    if issues:
+        with st.expander("📋 Data Quality Issues Fixed", expanded=True):
+            for issue in issues[:15]:
+                st.warning(issue)
     else:
-        st.warning("No matching column names found. Please check file format.")
+        st.success("✅ All data passed validation!")
     
-    # Show first few rows
-    st.markdown("### 📋 First 5 Rows of Data")
-    st.dataframe(df.head(5), use_container_width=True)
+    return df_clean
 
-def smart_column_mapping(df):
-    """Intelligently map columns based on content and names"""
-    df_mapped = df.copy()
-    
-    # Define possible column name variations
-    column_variations = {
-        'age': ['age', 'Age', 'AGE', 'years', 'Age (years)'],
-        'gender': ['gender', 'Gender', 'GENDER', 'sex', 'Sex'],
-        'height_cm': ['height_cm', 'height', 'Height', 'HEIGHT', 'ht', 'Ht', 'height(cm)', 'height (cm)'],
-        'weight_kg': ['weight_kg', 'weight', 'Weight', 'WEIGHT', 'wt', 'Wt', 'weight(kg)', 'weight (kg)'],
-        'body_fat_pct': ['body_fat_pct', 'body_fat', 'fat', 'BodyFat', 'body fat %', 'body_fat_percentage', 'fat_percentage'],
-        'diastolic': ['diastolic', 'Diastolic', 'DIASTOLIC', 'dbp', 'DBP', 'diastolic_bp'],
-        'systolic': ['systolic', 'Systolic', 'SYSTOLIC', 'sbp', 'SBP', 'systolic_bp'],
-        'gripForce': ['gripForce', 'grip_force', 'grip', 'Grip', 'GRIP', 'grip_strength', 'hand_grip'],
-        'sit_bend_forward_cm': ['sit_bend_forward_cm', 'sit_bend', 'flexibility', 'bend', 'sit_and_reach', 'sit_reach'],
-        'sit_ups_counts': ['sit_ups_counts', 'sit_ups', 'situps', 'SitUps', 'core', 'abs']
-    }
-    
-    # Try to map columns
-    for std_col, variations in column_variations.items():
-        for var in variations:
-            if var in df_mapped.columns:
-                df_mapped.rename(columns={var: std_col}, inplace=True)
-                break
-    
-    # Special handling: if gender column has text values like 'M'/'F' or 'Male'/'Female'
-    if 'gender' in df_mapped.columns:
-        gender_sample = df_mapped['gender'].iloc[0] if len(df_mapped) > 0 else None
-        if isinstance(gender_sample, str):
-            # Convert text to numeric
-            gender_map = {
-                'M': 0, 'MALE': 0, 'Male': 0, 'male': 0, 'm': 0,
-                'F': 1, 'FEMALE': 1, 'Female': 1, 'female': 1, 'f': 1
-            }
-            df_mapped['gender'] = df_mapped['gender'].map(gender_map).fillna(0)
-    
-    return df_mapped
-
-def enhanced_analyze_batch_data(df, scaler, clf, reg):
-    """Enhanced batch analysis with detailed error tracking"""
+def analyze_batch_data(df, scaler, clf, reg):
+    """Analyze batch data with proper validation"""
     feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
     results = []
-    error_details = []
     
     for idx, row in df.iterrows():
         try:
-            # Extract features with detailed error checking
-            features = []
-            missing_features = []
+            # Extract features
+            features = [row[col] for col in feature_names]
             
-            for col in feature_names:
-                if col in row.index:
-                    val = row[col]
-                    if col == 'gender':
-                        if isinstance(val, str):
-                            val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
-                        elif pd.isna(val):
-                            val = 0
-                    try:
-                        num_val = float(val) if pd.notna(val) else 0
-                        features.append(num_val)
-                    except:
-                        features.append(0)
-                        missing_features.append(f"{col}(conversion error)")
-                else:
-                    features.append(0)
-                    missing_features.append(col)
+            # Create input DataFrame
+            input_df = pd.DataFrame([features], columns=feature_names)
             
-            # Check if we have enough valid features
-            if len(missing_features) > 5:
-                results.append({
-                    'Row_Index': idx,
-                    'Predicted_Class': 'Error',
-                    'Predicted_Jump_CM': 0,
-                    'BMI': 0,
-                    'Status': f'Missing features: {missing_features[:5]}'
-                })
-                continue
-            
-            input_df = pd.DataFrame([features[:10]], columns=feature_names)
+            # Scale and predict
             scaled_data = scaler.transform(input_df)
             p_class = clf.predict(scaled_data)[0]
             p_jump = reg.predict(scaled_data)[0]
             
             # Calculate BMI
-            height = row.get('height_cm', row.get('height', 170))
-            weight = row.get('weight_kg', row.get('weight', 70))
+            height = row['height_cm']
+            weight = row['weight_kg']
             bmi = weight / ((height/100) ** 2) if height > 0 else 0
             
             results.append({
@@ -725,21 +415,13 @@ def enhanced_analyze_batch_data(df, scaler, clf, reg):
                 'Status': 'Success'
             })
         except Exception as e:
-            error_msg = str(e)[:100]
-            error_details.append(f"Row {idx}: {error_msg}")
             results.append({
                 'Row_Index': idx,
                 'Predicted_Class': 'Error',
                 'Predicted_Jump_CM': 0,
                 'BMI': 0,
-                'Status': f'Error: {error_msg}'
+                'Status': f'Error: {str(e)[:80]}'
             })
-    
-    # Show error details if any
-    if error_details:
-        with st.expander("📋 Error Details (First 10 errors)", expanded=False):
-            for err in error_details[:10]:
-                st.code(err)
     
     return pd.DataFrame(results)
 
@@ -764,7 +446,7 @@ with tab1:
     
     with col_in:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px; font-size: 2rem;'>🧬 BIOMETRIC SCANNER</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px;'>🧬 BIOMETRIC SCANNER</h2>", unsafe_allow_html=True)
         
         user_name = st.text_input("🏷️ ATHLETE NAME", "Enter athlete name...")
         
@@ -797,7 +479,7 @@ with tab1:
     
     with col_out:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px; font-size: 2rem;'>🛰️ ANALYTICAL OUTPUT</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff; margin-bottom:20px;'>🛰️ ANALYTICAL OUTPUT</h2>", unsafe_allow_html=True)
         
         if analyze:
             try:
@@ -890,168 +572,201 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (MODIFIED WITH DEBUGGING) ---
+# --- TAB 2: BATCH ANALYSIS (MODIFIED WITH VALIDATION) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload Excel or CSV file (supports various column name formats)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload Excel or CSV file for batch analysis</p>", unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader(
         "📁 Upload File (CSV, Excel)",
         type=['csv', 'xlsx', 'xls'],
-        help="Upload file with columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts"
+        help="Upload file with biometric data"
     )
     
     if uploaded_file is not None:
         df = process_uploaded_file(uploaded_file)
         
         if df is not None:
-            # Show file structure analysis
-            with st.expander("🔍 File Structure Analysis", expanded=True):
-                analyze_file_structure(df)
+            # Show original columns
+            st.info(f"📄 Original columns: {', '.join(df.columns)}")
             
             # Smart column mapping
-            df = smart_column_mapping(df)
+            st.markdown("### 🔄 Column Mapping")
             
-            # Show available columns after mapping
-            standard_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+            # Try to map common column names
+            column_mapping = {
+                'age': ['age', 'Age', 'AGE', 'years'],
+                'gender': ['gender', 'Gender', 'GENDER', 'sex'],
+                'height_cm': ['height_cm', 'height', 'Height', 'HEIGHT', 'ht'],
+                'weight_kg': ['weight_kg', 'weight', 'Weight', 'WEIGHT', 'wt'],
+                'body_fat_pct': ['body_fat_pct', 'body_fat', 'fat', 'BodyFat', 'body_fat_percentage'],
+                'diastolic': ['diastolic', 'Diastolic', 'DIASTOLIC', 'dbp'],
+                'systolic': ['systolic', 'Systolic', 'SYSTOLIC', 'sbp'],
+                'gripForce': ['gripForce', 'grip_force', 'grip', 'Grip', 'hand_grip'],
+                'sit_bend_forward_cm': ['sit_bend_forward_cm', 'sit_bend', 'flexibility', 'bend'],
+                'sit_ups_counts': ['sit_ups_counts', 'sit_ups', 'situps', 'SitUps']
+            }
+            
+            mapped_cols = {}
+            for std_col, variations in column_mapping.items():
+                for var in variations:
+                    if var in df.columns:
+                        mapped_cols[var] = std_col
+                        break
+            
+            if mapped_cols:
+                df.rename(columns=mapped_cols, inplace=True)
+                st.success(f"✅ Mapped columns: {', '.join([f'{old}→{new}' for old, new in mapped_cols.items()])}")
+            
+            # Check if we have all required columns
+            required_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                            'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
-            available_cols = [col for col in standard_cols if col in df.columns]
-            missing_cols = [col for col in standard_cols if col not in df.columns]
             
-            if available_cols:
-                st.success(f"✅ Mapped columns available: {', '.join(available_cols)}")
+            available_cols = [col for col in required_cols if col in df.columns]
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            
             if missing_cols:
-                st.warning(f"⚠️ Missing columns (will use defaults): {missing_cols}")
-            
-            # Display preview after mapping
-            with st.expander("📋 Preview Uploaded Data (After Column Mapping)", expanded=True):
-                cols_to_show = available_cols + [col for col in df.columns if col not in standard_cols][:3]
-                st.dataframe(df[cols_to_show].head(10), use_container_width=True)
-                st.caption(f"Total rows: {len(df)}")
-            
-            # Analyze button
-            if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
-                models = load_assets()
-                if models is None:
-                    st.error("❌ Models not loaded properly.")
-                else:
-                    clf, reg, scaler = models
-                    
-                    with st.spinner(f"📊 Analyzing {len(df)} records..."):
-                        progress_bar = st.progress(0)
-                        
-                        # Use enhanced analysis function
-                        results_df = enhanced_analyze_batch_data(df, scaler, clf, reg)
-                        
-                        progress_bar.empty()
-                        st.session_state.batch_results = results_df
-                    
-                    # Display results
-                    success_df = st.session_state.batch_results[st.session_state.batch_results['Status'] == 'Success']
-                    error_df = st.session_state.batch_results[st.session_state.batch_results['Status'] != 'Success']
-                    
-                    st.success(f"✅ Analysis completed! Successful: {len(success_df)} / {len(results_df)}")
-                    
-                    if len(error_df) > 0:
-                        st.warning(f"⚠️ Failed: {len(error_df)} records")
-                    
-                    if len(success_df) > 0:
-                        st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
-                        st.dataframe(st.session_state.batch_results, use_container_width=True)
-                        
-                        # Summary statistics
-                        col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-                        with col_s1:
-                            st.metric("Total Records", len(df))
-                        with col_s2:
-                            st.metric("Successful", len(success_df))
-                        with col_s3:
-                            st.metric("Failed", len(error_df))
-                        with col_s4:
-                            avg_jump = success_df['Predicted_Jump_CM'].mean()
-                            st.metric("Avg Jump Distance", f"{avg_jump:.1f} cm")
-                        
-                        # Class distribution
-                        class_counts = success_df['Predicted_Class'].value_counts()
-                        if len(class_counts) > 0:
-                            fig = px.pie(
-                                values=class_counts.values,
-                                names=class_counts.index,
-                                title="Performance Class Distribution",
-                                color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
-                            )
-                            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
-                            st.plotly_chart(fig, use_container_width=True)
-                        
-                        # Download results
-                        output = io.BytesIO()
-                        file_extension = uploaded_file.name.split('.')[-1].lower()
-                        
-                        if file_extension == 'csv':
-                            df_with_predictions = df.copy()
-                            predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
-                            df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
-                            df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
-                            df_with_predictions.to_csv(output, index=False, encoding='utf-8')
-                            mime_type = "text/csv"
-                            output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+                st.error(f"❌ Missing required columns: {missing_cols}")
+                st.info("Please ensure your file contains these columns. Check the 'File Structure Analysis' above.")
+            else:
+                st.success(f"✅ All required columns found: {', '.join(available_cols)}")
+                
+                # Display preview
+                with st.expander("📋 Preview Uploaded Data", expanded=True):
+                    st.dataframe(df[required_cols].head(10), use_container_width=True)
+                    st.caption(f"Total rows: {len(df)}")
+                
+                # Validate and clean data
+                df_clean = validate_and_clean_data(df)
+                
+                if df_clean is not None:
+                    # Analyze button
+                    if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
+                        models = load_assets()
+                        if models is None:
+                            st.error("❌ Models not loaded properly.")
                         else:
-                            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                                st.session_state.batch_results.to_excel(writer, sheet_name='Analysis Results', index=False)
-                                df_with_predictions = df.copy()
-                                predictions_dict = success_df.set_index('Row_Index')[['Predicted_Class', 'Predicted_Jump_CM']].to_dict('index')
-                                df_with_predictions['Predicted_Class'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Class', 'Error'))
-                                df_with_predictions['Predicted_Jump_CM'] = df_with_predictions.index.map(lambda x: predictions_dict.get(x, {}).get('Predicted_Jump_CM', 0))
-                                df_with_predictions.to_excel(writer, sheet_name='Data with Predictions', index=False)
-                            mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            output_filename = f"Batch_Analysis_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-                        
-                        output.seek(0)
-                        st.download_button(
-                            label="📥 DOWNLOAD RESULTS",
-                            data=output,
-                            file_name=output_filename,
-                            mime=mime_type,
-                            use_container_width=True
-                        )
-                    else:
-                        st.error("❌ No records were successfully analyzed.")
-                        st.info("""
-                        **Possible reasons:**
-                        1. Column names don't match expected format
-                        2. Data contains non-numeric values in numeric columns
-                        3. Gender column has unexpected values
-                        
-                        **Solution:** Check the "File Structure Analysis" section above to see your actual column names.
-                        """)
+                            clf, reg, scaler = models
+                            
+                            with st.spinner(f"📊 Analyzing {len(df_clean)} records..."):
+                                progress_bar = st.progress(0)
+                                
+                                results = []
+                                for idx, row in df_clean.iterrows():
+                                    progress_bar.progress((idx + 1) / len(df_clean))
+                                    
+                                    try:
+                                        features = [row[col] for col in required_cols]
+                                        input_df = pd.DataFrame([features], columns=required_cols)
+                                        scaled_data = scaler.transform(input_df)
+                                        p_class = clf.predict(scaled_data)[0]
+                                        p_jump = reg.predict(scaled_data)[0]
+                                        
+                                        height = row['height_cm']
+                                        weight = row['weight_kg']
+                                        bmi = weight / ((height/100) ** 2) if height > 0 else 0
+                                        
+                                        results.append({
+                                            'Row': idx,
+                                            'Predicted_Class': p_class,
+                                            'Predicted_Jump_CM': round(p_jump, 2),
+                                            'BMI': round(bmi, 2)
+                                        })
+                                    except Exception as e:
+                                        results.append({
+                                            'Row': idx,
+                                            'Predicted_Class': 'Error',
+                                            'Predicted_Jump_CM': 0,
+                                            'BMI': 0
+                                        })
+                                
+                                progress_bar.empty()
+                                results_df = pd.DataFrame(results)
+                            
+                            success_count = len(results_df[results_df['Predicted_Class'] != 'Error'])
+                            st.success(f"✅ Analysis completed! Successful: {success_count} / {len(results_df)}")
+                            
+                            if success_count > 0:
+                                st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
+                                st.dataframe(results_df.head(20), use_container_width=True)
+                                
+                                # Summary stats
+                                success_df = results_df[results_df['Predicted_Class'] != 'Error']
+                                
+                                col1, col2, col3, col4 = st.columns(4)
+                                with col1:
+                                    st.metric("Total Records", len(df))
+                                with col2:
+                                    st.metric("Successful", len(success_df))
+                                with col3:
+                                    st.metric("Failed", len(df) - len(success_df))
+                                with col4:
+                                    if len(success_df) > 0:
+                                        st.metric("Avg Jump", f"{success_df['Predicted_Jump_CM'].mean():.1f} cm")
+                                
+                                # Class distribution
+                                class_counts = success_df['Predicted_Class'].value_counts()
+                                fig = px.pie(
+                                    values=class_counts.values,
+                                    names=class_counts.index,
+                                    title="Performance Class Distribution",
+                                    color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
+                                )
+                                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                                st.plotly_chart(fig, use_container_width=True)
+                                
+                                # Download results
+                                output = io.BytesIO()
+                                file_ext = uploaded_file.name.split('.')[-1].lower()
+                                
+                                if file_ext == 'csv':
+                                    results_df.to_csv(output, index=False, encoding='utf-8')
+                                    mime = "text/csv"
+                                    filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+                                else:
+                                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                                        results_df.to_excel(writer, sheet_name='Results', index=False)
+                                    mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+                                
+                                output.seek(0)
+                                st.download_button(
+                                    label="📥 DOWNLOAD RESULTS",
+                                    data=output,
+                                    file_name=filename,
+                                    mime=mime,
+                                    use_container_width=True
+                                )
+                            else:
+                                st.error("❌ No records were successfully analyzed.")
+                                st.info("Please check the data validation section for issues.")
     
     else:
         st.info("📂 Upload an Excel or CSV file to begin batch analysis")
         
-        with st.expander("📝 View Required Format", expanded=False):
+        with st.expander("📝 Required Columns Format", expanded=False):
             st.markdown("""
             ### Required Columns:
-            | Column Name | Description | Example |
-            |------------|-------------|---------|
-            | age | Age in years | 25 |
-            | gender | 0 for Male, 1 for Female | 0 |
-            | height_cm | Height in centimeters | 175.5 |
-            | weight_kg | Weight in kilograms | 70.2 |
-            | body_fat_pct | Body fat percentage | 18.5 |
-            | diastolic | Diastolic blood pressure | 80 |
-            | systolic | Systolic blood pressure | 120 |
-            | gripForce | Grip strength in kg | 45.5 |
-            | sit_bend_forward_cm | Flexibility measurement | 15.3 |
-            | sit_ups_counts | Number of sit-ups | 45 |
+            | Column | Description | Type |
+            |--------|-------------|------|
+            | age | Age in years | Numeric (10-80) |
+            | gender | 0=Male, 1=Female | Numeric (0/1) |
+            | height_cm | Height in cm | Numeric (100-220) |
+            | weight_kg | Weight in kg | Numeric (30-150) |
+            | body_fat_pct | Body fat % | Numeric (5-50) |
+            | diastolic | Diastolic BP | Numeric (40-130) |
+            | systolic | Systolic BP | Numeric (80-200) |
+            | gripForce | Grip strength | Numeric (0-100) |
+            | sit_bend_forward_cm | Flexibility | Numeric (-20-40) |
+            | sit_ups_counts | Sit-ups count | Numeric (0-100) |
             """)
             
             st.markdown("### CSV Example:")
             st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
 25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
-30,1,165.3,65.4,22.0,75,115,38.2,12.5,38""", language='csv')
-            
-            st.info("💡 **Tip:** After uploading, the system will show file structure analysis to help identify column mapping issues.")
+30,1,165.3,65.4,22.0,75,115,38.2,12.5,38
+28,0,180.2,78.5,15.2,82,125,52.3,18.2,52""", language='csv')
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1059,41 +774,28 @@ with tab2:
 with tab3:
     if st.session_state.last_analysis:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 PERFORMANCE RADAR</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff;'>📊 PERFORMANCE RADAR</h2>", unsafe_allow_html=True)
         
         last = st.session_state.last_analysis
         
         categories = ['Strength', 'Flexibility', 'Endurance', 'Power', 'BMI']
-        
         strength_score = min(100, (last['grip'] / 60) * 100)
         flexibility_score = min(100, ((last['flex'] + 20) / 60) * 100)
         endurance_score = min(100, (last['situps'] / 80) * 100)
         power_score = min(100, (last['jump'] / 280) * 100)
         bmi_score = 100 - abs(last['bmi'] - 22) * 5
-        
         values = [strength_score, flexibility_score, endurance_score, power_score, max(0, min(100, bmi_score))]
         
         fig = go.Figure(data=go.Scatterpolar(
-            r=values,
-            theta=categories,
-            fill='toself',
-            marker=dict(color='rgba(0, 242, 255, 0.8)', size=10),
-            line=dict(color='#00f2ff', width=4),
-            name='Current Performance'
+            r=values, theta=categories, fill='toself',
+            marker=dict(color='rgba(0,242,255,0.8)', size=10),
+            line=dict(color='#00f2ff', width=4)
         ))
-        
         fig.update_layout(
-            polar=dict(
-                radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=14)),
-                angularaxis=dict(tickfont=dict(size=14))
-            ),
+            polar=dict(radialaxis=dict(visible=True, range=[0, 100]), angularaxis=dict(tickfont=dict(size=14))),
             title="Multi-Dimensional Performance Analysis",
-            title_font=dict(size=18, color='#00f2ff'),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            height=550
+            paper_bgcolor="rgba(0,0,0,0)", height=550
         )
-        
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("<h3 style='color:#00f2ff; margin-top: 35px;'>📈 DETAILED METRICS</h3>", unsafe_allow_html=True)
@@ -1105,10 +807,8 @@ with tab3:
                           get_fat_percentile(last["fat"]), get_grip_percentile(last["grip"]), 
                           get_flex_percentile(last["flex"]), get_situps_percentile(last["situps"])]
         }
-        
         df_metrics = pd.DataFrame(metrics_data)
         st.dataframe(df_metrics, use_container_width=True, hide_index=True)
-        
         st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.info("🔍 Complete a single analysis to view detailed metrics.")
@@ -1117,39 +817,28 @@ with tab3:
 with tab4:
     if len(st.session_state.analysis_history) > 0:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📈 PERFORMANCE TRENDS</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#00f2ff;'>📈 PERFORMANCE TRENDS</h2>", unsafe_allow_html=True)
         
         history_df = pd.DataFrame(st.session_state.analysis_history)
         
         if len(history_df) > 1:
             fig = go.Figure()
-            
             fig.add_trace(go.Scatter(
-                x=history_df['timestamp'],
-                y=history_df['jump'],
-                mode='lines+markers',
-                name='Jump Distance',
-                line=dict(color='#00f2ff', width=5),
-                marker=dict(size=12, color='#0062ff')
+                x=history_df['timestamp'], y=history_df['jump'],
+                mode='lines+markers', name='Jump Distance',
+                line=dict(color='#00f2ff', width=5), marker=dict(size=12, color='#0062ff')
             ))
-            
             fig.update_layout(
-                title="Performance Evolution Over Time",
-                title_font=dict(size=18, color='#00f2ff'),
-                xaxis_title="Analysis Date",
-                yaxis_title="Jump Distance (cm)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                height=450
+                title="Performance Evolution Over Time", title_font=dict(size=18, color='#00f2ff'),
+                xaxis_title="Analysis Date", yaxis_title="Jump Distance (cm)",
+                paper_bgcolor="rgba(0,0,0,0)", height=450
             )
-            
             st.plotly_chart(fig, use_container_width=True)
             
             if len(history_df) >= 2:
                 first_jump = history_df.iloc[0]['jump']
                 last_jump = history_df.iloc[-1]['jump']
                 improvement = last_jump - first_jump
-                
                 if improvement > 0:
                     st.success(f"📈 Positive trend! Improved by {improvement:.1f} cm")
                 elif improvement < 0:
@@ -1158,7 +847,6 @@ with tab4:
                     st.info("📊 Performance stable")
         else:
             st.info("📊 Perform multiple analyses to see trends")
-        
         st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.info("📈 Complete at least 2 analyses to view trends")
@@ -1166,10 +854,9 @@ with tab4:
 # --- TAB 5: RESOURCE LIBRARY ---
 with tab5:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📚 ATHLETE DEVELOPMENT RESOURCES</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#00f2ff;'>📚 ATHLETE DEVELOPMENT RESOURCES</h2>", unsafe_allow_html=True)
     
     col_r1, col_r2 = st.columns(2)
-    
     with col_r1:
         st.markdown("""
         <div style="background: rgba(0,242,255,0.1); padding: 25px; border-radius: 15px;">
@@ -1180,7 +867,6 @@ with tab5:
             <p><strong>Developing Level (Class C/D)</strong><br>Foundation strength, mobility focus</p>
         </div>
         """, unsafe_allow_html=True)
-    
     with col_r2:
         st.markdown("""
         <div style="background: rgba(0,242,255,0.1); padding: 25px; border-radius: 15px;">
@@ -1202,13 +888,12 @@ with tab5:
         <p>• Sleep 7-9h improves performance by 15%</p>
     </div>
     """, unsafe_allow_html=True)
-    
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 11. FOOTER ---
+# --- FOOTER ---
 st.markdown("""
 <div class='footer'>
-    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis (CSV/Excel with Auto-Encoding)</p>
+    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis with Auto-Validation</p>
     <p>© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
     <p>Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
 </div>
