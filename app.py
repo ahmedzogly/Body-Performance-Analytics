@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. CSS (نفس الكود السابق، تم اختصاره للتوفير) ---
+# --- 2. CSS (مختصر) ---
 st.markdown("""
     <style>
     .main { background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%); color: #00f2ff; }
@@ -40,7 +40,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. TEXT CLEANING FOR PDF (نفس الكود السابق) ---
+# --- 3. TEXT CLEANING FOR PDF ---
 def clean_text_for_pdf(text):
     if not text:
         return ""
@@ -72,7 +72,7 @@ def clean_text_for_pdf(text):
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned if cleaned else "Information"
 
-# --- 4. HELPER FUNCTIONS (نفس الكود السابق) ---
+# --- 4. HELPER FUNCTIONS ---
 def get_percentile(grade):
     percentiles = {'A': 'Top 15%', 'B': 'Top 35%', 'C': 'Average (50-70%)', 'D': 'Bottom 20%'}
     return percentiles.get(grade, 'Average')
@@ -156,7 +156,7 @@ def get_performance_insights(grade, jump_distance, age):
         insights.append("- Focus on mobility and injury prevention.")
     return '\n'.join(insights)
 
-# --- 5. PDF GENERATOR (نفس الكود السابق) ---
+# --- 5. PDF GENERATOR ---
 class TitanPDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -258,7 +258,7 @@ def load_assets():
             return None
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. SPECIAL FILE PROCESSING FOR YOUR DATA FORMAT ---
+# --- 7. SPECIAL FILE PROCESSING FOR YOUR DATA FORMAT (FIXED) ---
 def process_special_file_format(uploaded_file):
     """Special processing for your specific file format"""
     file_extension = uploaded_file.name.split('.')[-1].lower()
@@ -269,9 +269,8 @@ def process_special_file_format(uploaded_file):
             file_bytes = uploaded_file.getvalue()
             
             # Try to detect encoding
-            encoding, _ = chardet.detect(file_bytes)
-            if not encoding:
-                encoding = 'utf-8'
+            result = chardet.detect(file_bytes)
+            encoding = result['encoding'] if result else 'utf-8'
             
             # Decode the file
             text_content = file_bytes.decode(encoding, errors='ignore')
@@ -279,35 +278,32 @@ def process_special_file_format(uploaded_file):
             # Split into lines
             lines = text_content.strip().split('\n')
             
-            # Extract header and data
-            header_line = lines[0]
-            data_lines = lines[1:]
-            
-            # Parse header to identify columns
-            # Based on your screenshot, the header seems to have merged columns
-            # Let's create standard column names
-            standard_columns = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                               'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 
-                               'sit_ups_counts', 'broad_jump_cm', 'class']
-            
-            # Try to extract data using regex
+            # Extract data rows (skip header if exists)
             data_rows = []
             
-            for line in data_lines:
+            for line in lines:
                 if not line.strip():
                     continue
                 
-                # Extract numbers and letters using regex
-                # Pattern to find numbers (integers and decimals)
-                numbers = re.findall(r'(\d+\.?\d*)', line)
-                # Pattern to find class letter (A, B, C, D) at the end
+                # Check if this is a header line (contains words like 'age', 'gender')
+                if any(word in line.lower() for word in ['age', 'gender', 'height', 'weight']):
+                    # This might be a header, skip it
+                    continue
+                
+                # Extract all numbers (integers and decimals)
+                numbers = re.findall(r'\d+\.?\d*', line)
+                
+                # Extract class letter (A, B, C, D) from the end
                 class_match = re.search(r'([A-D])\s*$', line)
                 
-                if len(numbers) >= 11:  # We expect at least 11 numeric values
+                # Extract gender (M or F) from the line
+                gender_match = re.search(r'([MF])\s', line)
+                
+                if len(numbers) >= 10:  # We have at least 10 numeric values
                     try:
                         row_data = {
-                            'age': float(numbers[0]) if numbers[0] else 25,
-                            'gender': 0 if 'M' in line or 'm' in line[:10] else 1,  # Try to detect gender
+                            'age': float(numbers[0]) if len(numbers) > 0 else 25,
+                            'gender': 0 if gender_match and gender_match.group(1) == 'M' else 1,
                             'height_cm': float(numbers[1]) if len(numbers) > 1 else 170,
                             'weight_kg': float(numbers[2]) if len(numbers) > 2 else 70,
                             'body_fat_pct': float(numbers[3]) if len(numbers) > 3 else 18,
@@ -320,10 +316,10 @@ def process_special_file_format(uploaded_file):
                             'class': class_match.group(1) if class_match else 'C'
                         }
                         
-                        # Gender detection based on text
-                        if 'M' in line[:5] or 'm' in line[:5]:
+                        # Override gender if not detected from pattern
+                        if 'M' in line and not gender_match:
                             row_data['gender'] = 0
-                        elif 'F' in line[:5] or 'f' in line[:5]:
+                        elif 'F' in line and not gender_match:
                             row_data['gender'] = 1
                         
                         data_rows.append(row_data)
@@ -381,24 +377,15 @@ def validate_and_clean_data(df):
                 df_clean[col] = default_values.get(col, 0)
     
     # Clean data
-    # Age range
     df_clean['age'] = df_clean['age'].clip(10, 80)
-    # Gender (0 or 1)
     df_clean['gender'] = df_clean['gender'].apply(lambda x: 0 if x < 0.5 else 1)
-    # Height range
     df_clean['height_cm'] = df_clean['height_cm'].clip(100, 220)
-    # Weight range
     df_clean['weight_kg'] = df_clean['weight_kg'].clip(30, 150)
-    # Body fat range
     df_clean['body_fat_pct'] = df_clean['body_fat_pct'].clip(5, 50)
-    # Blood pressure ranges
     df_clean['diastolic'] = df_clean['diastolic'].clip(40, 130)
     df_clean['systolic'] = df_clean['systolic'].clip(80, 200)
-    # Grip strength
     df_clean['gripForce'] = df_clean['gripForce'].clip(0, 100)
-    # Flexibility
     df_clean['sit_bend_forward_cm'] = df_clean['sit_bend_forward_cm'].clip(-20, 40)
-    # Sit-ups
     df_clean['sit_ups_counts'] = df_clean['sit_ups_counts'].clip(0, 100)
     
     # Fill NaN values
@@ -459,7 +446,7 @@ st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Ex
 # Create Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔬 SINGLE ANALYSIS", "📊 BATCH ANALYSIS", "📈 PERFORMANCE DASHBOARD", "📊 TREND ANALYTICS", "📚 RESOURCE LIBRARY"])
 
-# --- TAB 1: SINGLE ANALYSIS (نفس الكود السابق) ---
+# --- TAB 1: SINGLE ANALYSIS ---
 with tab1:
     col_in, col_out = st.columns([1, 1.2], gap="large")
     
@@ -591,7 +578,7 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (MODIFIED FOR SPECIAL FORMAT) ---
+# --- TAB 2: BATCH ANALYSIS (MODIFIED) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
@@ -708,11 +695,6 @@ with tab2:
             | sit_bend_forward_cm | Flexibility | 15.3 |
             | sit_ups_counts | Sit-ups count | 45 |
             """)
-            
-            st.markdown("### CSV Example:")
-            st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
-25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
-30,1,165.3,65.4,22.0,75,115,38.2,12.5,38""", language='csv')
     
     st.markdown('</div>', unsafe_allow_html=True)
 
