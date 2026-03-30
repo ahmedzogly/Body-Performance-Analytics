@@ -541,13 +541,49 @@ def load_assets():
             return None
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. FILE PROCESSING FUNCTIONS ---
+# --- 7. ENHANCED FILE PROCESSING WITH COLUMN MAPPING ---
 def detect_encoding(file_bytes):
     try:
         result = chardet.detect(file_bytes)
         return result['encoding'], result['confidence']
     except:
         return None, 0
+
+def map_column_names(df):
+    """Map various column name variations to standard names"""
+    column_mapping = {
+        # Age variations
+        'age': 'age', 'Age': 'age', 'AGE': 'age',
+        # Gender variations
+        'gender': 'gender', 'Gender': 'gender', 'GENDER': 'gender',
+        # Height variations
+        'height_cm': 'height_cm', 'height': 'height_cm', 'Height': 'height_cm', 'HEIGHT': 'height_cm',
+        # Weight variations
+        'weight_kg': 'weight_kg', 'weight': 'weight_kg', 'Weight': 'weight_kg', 'WEIGHT': 'weight_kg',
+        # Body fat variations
+        'body_fat_pct': 'body_fat_pct', 'body_fat': 'body_fat_pct', 'fat': 'body_fat_pct',
+        'body_fat_percentage': 'body_fat_pct', 'BodyFat': 'body_fat_pct',
+        # Blood pressure variations
+        'diastolic': 'diastolic', 'Diastolic': 'diastolic', 'DIASTOLIC': 'diastolic',
+        'systolic': 'systolic', 'Systolic': 'systolic', 'SYSTOLIC': 'systolic',
+        # Grip force variations
+        'gripForce': 'gripForce', 'grip_force': 'gripForce', 'grip': 'gripForce',
+        'GripForce': 'gripForce', 'GRIPFORCE': 'gripForce',
+        # Flexibility variations
+        'sit_bend_forward_cm': 'sit_bend_forward_cm', 'sit_bend': 'sit_bend_forward_cm',
+        'flexibility': 'sit_bend_forward_cm', 'bend': 'sit_bend_forward_cm',
+        # Sit-ups variations
+        'sit_ups_counts': 'sit_ups_counts', 'sit_ups': 'sit_ups_counts', 'situps': 'sit_ups_counts',
+        'SitUps': 'sit_ups_counts', 'sit-ups': 'sit_ups_counts'
+    }
+    
+    # Rename columns
+    df_renamed = df.copy()
+    for old_col, new_col in column_mapping.items():
+        if old_col in df_renamed.columns and old_col != new_col:
+            df_renamed.rename(columns={old_col: new_col}, inplace=True)
+    
+    return df_renamed
 
 def process_uploaded_file(uploaded_file):
     file_extension = uploaded_file.name.split('.')[-1].lower()
@@ -592,120 +628,57 @@ def process_uploaded_file(uploaded_file):
         st.error(f"Error reading file: {str(e)}")
         return None
 
-# --- 8. DEBUGGING FUNCTIONS ---
-def analyze_file_structure(df):
-    """Analyze and display file structure for debugging"""
-    st.markdown("### 🔍 File Structure Analysis")
+def extract_features_from_row(row):
+    """Extract features from row with flexible column names"""
+    # Standard feature names
+    feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+                    'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
-    # Display column info
-    col_info = pd.DataFrame({
-        'Column Name': df.columns,
-        'Data Type': df.dtypes.values,
-        'Non-Null Count': df.count().values,
-        'Sample Values': [str(df[col].iloc[0])[:50] if len(df) > 0 else 'No data' for col in df.columns]
-    })
-    st.dataframe(col_info, use_container_width=True)
+    features = []
+    for col in feature_names:
+        if col in row.index:
+            val = row[col]
+            # Handle gender specially
+            if col == 'gender':
+                if isinstance(val, str):
+                    val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
+                elif pd.isna(val):
+                    val = 0
+            # Convert to float
+            try:
+                features.append(float(val) if pd.notna(val) else 0)
+            except:
+                features.append(0)
+        else:
+            features.append(0)
     
-    # Check for potential column name matches (case insensitive)
-    st.markdown("### 🔄 Column Name Mapping Suggestions")
-    standard_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
-    
-    matches = {}
-    for std_col in standard_cols:
-        possible_matches = [col for col in df.columns if std_col.lower() in col.lower()]
-        if possible_matches:
-            matches[std_col] = possible_matches
-    
-    if matches:
-        st.json(matches)
-    else:
-        st.warning("No matching column names found. Please check file format.")
-    
-    # Show first few rows
-    st.markdown("### 📋 First 5 Rows of Data")
-    st.dataframe(df.head(5), use_container_width=True)
+    return features
 
-def smart_column_mapping(df):
-    """Intelligently map columns based on content and names"""
-    df_mapped = df.copy()
-    
-    # Define possible column name variations
-    column_variations = {
-        'age': ['age', 'Age', 'AGE', 'years', 'Age (years)'],
-        'gender': ['gender', 'Gender', 'GENDER', 'sex', 'Sex'],
-        'height_cm': ['height_cm', 'height', 'Height', 'HEIGHT', 'ht', 'Ht', 'height(cm)', 'height (cm)'],
-        'weight_kg': ['weight_kg', 'weight', 'Weight', 'WEIGHT', 'wt', 'Wt', 'weight(kg)', 'weight (kg)'],
-        'body_fat_pct': ['body_fat_pct', 'body_fat', 'fat', 'BodyFat', 'body fat %', 'body_fat_percentage', 'fat_percentage'],
-        'diastolic': ['diastolic', 'Diastolic', 'DIASTOLIC', 'dbp', 'DBP', 'diastolic_bp'],
-        'systolic': ['systolic', 'Systolic', 'SYSTOLIC', 'sbp', 'SBP', 'systolic_bp'],
-        'gripForce': ['gripForce', 'grip_force', 'grip', 'Grip', 'GRIP', 'grip_strength', 'hand_grip'],
-        'sit_bend_forward_cm': ['sit_bend_forward_cm', 'sit_bend', 'flexibility', 'bend', 'sit_and_reach', 'sit_reach'],
-        'sit_ups_counts': ['sit_ups_counts', 'sit_ups', 'situps', 'SitUps', 'core', 'abs']
-    }
-    
-    # Try to map columns
-    for std_col, variations in column_variations.items():
-        for var in variations:
-            if var in df_mapped.columns:
-                df_mapped.rename(columns={var: std_col}, inplace=True)
-                break
-    
-    # Special handling: if gender column has text values like 'M'/'F' or 'Male'/'Female'
-    if 'gender' in df_mapped.columns:
-        gender_sample = df_mapped['gender'].iloc[0] if len(df_mapped) > 0 else None
-        if isinstance(gender_sample, str):
-            # Convert text to numeric
-            gender_map = {
-                'M': 0, 'MALE': 0, 'Male': 0, 'male': 0, 'm': 0,
-                'F': 1, 'FEMALE': 1, 'Female': 1, 'female': 1, 'f': 1
-            }
-            df_mapped['gender'] = df_mapped['gender'].map(gender_map).fillna(0)
-    
-    return df_mapped
-
-def enhanced_analyze_batch_data(df, scaler, clf, reg):
-    """Enhanced batch analysis with detailed error tracking"""
+def analyze_batch_data(df, scaler, clf, reg):
+    """Analyze batch data with flexible column handling"""
     feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
     results = []
-    error_details = []
     
     for idx, row in df.iterrows():
         try:
-            # Extract features with detailed error checking
+            # Extract features
             features = []
-            missing_features = []
-            
             for col in feature_names:
                 if col in row.index:
                     val = row[col]
                     if col == 'gender':
                         if isinstance(val, str):
                             val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
-                        elif pd.isna(val):
-                            val = 0
+                        elif isinstance(val, (int, float)):
+                            pass
                     try:
-                        num_val = float(val) if pd.notna(val) else 0
-                        features.append(num_val)
+                        features.append(float(val) if pd.notna(val) else 0)
                     except:
                         features.append(0)
-                        missing_features.append(f"{col}(conversion error)")
                 else:
                     features.append(0)
-                    missing_features.append(col)
-            
-            # Check if we have enough valid features
-            if len(missing_features) > 5:
-                results.append({
-                    'Row_Index': idx,
-                    'Predicted_Class': 'Error',
-                    'Predicted_Jump_CM': 0,
-                    'BMI': 0,
-                    'Status': f'Missing features: {missing_features[:5]}'
-                })
-                continue
             
             input_df = pd.DataFrame([features[:10]], columns=feature_names)
             scaled_data = scaler.transform(input_df)
@@ -725,25 +698,17 @@ def enhanced_analyze_batch_data(df, scaler, clf, reg):
                 'Status': 'Success'
             })
         except Exception as e:
-            error_msg = str(e)[:100]
-            error_details.append(f"Row {idx}: {error_msg}")
             results.append({
                 'Row_Index': idx,
                 'Predicted_Class': 'Error',
                 'Predicted_Jump_CM': 0,
                 'BMI': 0,
-                'Status': f'Error: {error_msg}'
+                'Status': f'Error: {str(e)[:50]}'
             })
-    
-    # Show error details if any
-    if error_details:
-        with st.expander("📋 Error Details (First 10 errors)", expanded=False):
-            for err in error_details[:10]:
-                st.code(err)
     
     return pd.DataFrame(results)
 
-# --- 9. SESSION STATE ---
+# --- 8. SESSION STATE ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
@@ -751,7 +716,7 @@ if 'last_analysis' not in st.session_state:
 if 'batch_results' not in st.session_state:
     st.session_state.batch_results = None
 
-# --- 10. MAIN INTERFACE ---
+# --- 9. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ BODY PERFORMANCE AI PRO ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
@@ -890,7 +855,7 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (MODIFIED WITH DEBUGGING) ---
+# --- TAB 2: BATCH ANALYSIS ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
@@ -906,28 +871,16 @@ with tab2:
         df = process_uploaded_file(uploaded_file)
         
         if df is not None:
-            # Show file structure analysis
-            with st.expander("🔍 File Structure Analysis", expanded=True):
-                analyze_file_structure(df)
+            # Show original column names
+            st.info(f"📄 Original columns: {', '.join(df.columns)}")
             
-            # Smart column mapping
-            df = smart_column_mapping(df)
+            # Map column names to standard format
+            df = map_column_names(df)
+            st.success(f"✅ Mapped columns. Standard columns available: {', '.join([c for c in ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'] if c in df.columns])}")
             
-            # Show available columns after mapping
-            standard_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                           'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
-            available_cols = [col for col in standard_cols if col in df.columns]
-            missing_cols = [col for col in standard_cols if col not in df.columns]
-            
-            if available_cols:
-                st.success(f"✅ Mapped columns available: {', '.join(available_cols)}")
-            if missing_cols:
-                st.warning(f"⚠️ Missing columns (will use defaults): {missing_cols}")
-            
-            # Display preview after mapping
-            with st.expander("📋 Preview Uploaded Data (After Column Mapping)", expanded=True):
-                cols_to_show = available_cols + [col for col in df.columns if col not in standard_cols][:3]
-                st.dataframe(df[cols_to_show].head(10), use_container_width=True)
+            # Display first few rows
+            with st.expander("📋 Preview Uploaded Data", expanded=True):
+                st.dataframe(df.head(10), use_container_width=True)
                 st.caption(f"Total rows: {len(df)}")
             
             # Analyze button
@@ -940,21 +893,60 @@ with tab2:
                     
                     with st.spinner(f"📊 Analyzing {len(df)} records..."):
                         progress_bar = st.progress(0)
+                        results = []
                         
-                        # Use enhanced analysis function
-                        results_df = enhanced_analyze_batch_data(df, scaler, clf, reg)
+                        for idx, row in df.iterrows():
+                            progress_bar.progress((idx + 1) / len(df))
+                            
+                            try:
+                                features = []
+                                # Try to get features from row
+                                for col in ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+                                          'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']:
+                                    if col in row.index:
+                                        val = row[col]
+                                        if col == 'gender':
+                                            if isinstance(val, str):
+                                                val = 0 if val.upper() in ['M', 'MALE', 'M'] else 1
+                                            elif pd.isna(val):
+                                                val = 0
+                                        features.append(float(val) if pd.notna(val) else 0)
+                                    else:
+                                        features.append(0)
+                                
+                                input_df = pd.DataFrame([features[:10]], columns=['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+                                                                                 'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts'])
+                                scaled_data = scaler.transform(input_df)
+                                p_class = clf.predict(scaled_data)[0]
+                                p_jump = reg.predict(scaled_data)[0]
+                                
+                                # Calculate BMI
+                                height = row.get('height_cm', row.get('height', 170))
+                                weight = row.get('weight_kg', row.get('weight', 70))
+                                bmi = weight / ((height/100) ** 2) if height > 0 else 0
+                                
+                                results.append({
+                                    'Row_Index': idx,
+                                    'Predicted_Class': p_class,
+                                    'Predicted_Jump_CM': round(p_jump, 2),
+                                    'BMI': round(bmi, 2),
+                                    'Status': 'Success'
+                                })
+                            except Exception as e:
+                                results.append({
+                                    'Row_Index': idx,
+                                    'Predicted_Class': 'Error',
+                                    'Predicted_Jump_CM': 0,
+                                    'BMI': 0,
+                                    'Status': f'Error: {str(e)[:50]}'
+                                })
                         
                         progress_bar.empty()
-                        st.session_state.batch_results = results_df
+                        st.session_state.batch_results = pd.DataFrame(results)
                     
                     # Display results
                     success_df = st.session_state.batch_results[st.session_state.batch_results['Status'] == 'Success']
-                    error_df = st.session_state.batch_results[st.session_state.batch_results['Status'] != 'Success']
-                    
-                    st.success(f"✅ Analysis completed! Successful: {len(success_df)} / {len(results_df)}")
-                    
-                    if len(error_df) > 0:
-                        st.warning(f"⚠️ Failed: {len(error_df)} records")
+                    st.success(f"✅ Analysis completed! Successful: {len(success_df)} / {len(results)}")
                     
                     if len(success_df) > 0:
                         st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
@@ -967,22 +959,21 @@ with tab2:
                         with col_s2:
                             st.metric("Successful", len(success_df))
                         with col_s3:
-                            st.metric("Failed", len(error_df))
+                            st.metric("Failed", len(df) - len(success_df))
                         with col_s4:
                             avg_jump = success_df['Predicted_Jump_CM'].mean()
                             st.metric("Avg Jump Distance", f"{avg_jump:.1f} cm")
                         
                         # Class distribution
                         class_counts = success_df['Predicted_Class'].value_counts()
-                        if len(class_counts) > 0:
-                            fig = px.pie(
-                                values=class_counts.values,
-                                names=class_counts.index,
-                                title="Performance Class Distribution",
-                                color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
-                            )
-                            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
-                            st.plotly_chart(fig, use_container_width=True)
+                        fig = px.pie(
+                            values=class_counts.values,
+                            names=class_counts.index,
+                            title="Performance Class Distribution",
+                            color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
+                        )
+                        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                        st.plotly_chart(fig, use_container_width=True)
                         
                         # Download results
                         output = io.BytesIO()
@@ -1016,14 +1007,11 @@ with tab2:
                             use_container_width=True
                         )
                     else:
-                        st.error("❌ No records were successfully analyzed.")
+                        st.error("❌ No records were successfully analyzed. Please check your file format.")
                         st.info("""
-                        **Possible reasons:**
-                        1. Column names don't match expected format
-                        2. Data contains non-numeric values in numeric columns
-                        3. Gender column has unexpected values
+                        **Required columns:** age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts
                         
-                        **Solution:** Check the "File Structure Analysis" section above to see your actual column names.
+                        **Gender format:** Use 0 for Male, 1 for Female (or M/F, Male/Female)
                         """)
     
     else:
@@ -1050,8 +1038,6 @@ with tab2:
             st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
 25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
 30,1,165.3,65.4,22.0,75,115,38.2,12.5,38""", language='csv')
-            
-            st.info("💡 **Tip:** After uploading, the system will show file structure analysis to help identify column mapping issues.")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
