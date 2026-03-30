@@ -46,7 +46,15 @@ We compared several models including SVM, Random Forest, Naive Bayes, and Neural
 ### Prerequisites
 * Python 3.9 or higher
 * Git
-
+# Alternative versions if compatibility issues
+streamlit>=1.25.0
+pandas>=1.5.0
+numpy>=1.23.0
+scikit-learn>=1.2.0
+plotly>=5.14.0
+fpdf2>=2.7.0
+openpyxl>=3.1.0
+chardet>=5.0.0
 ### Setup
 1. **Clone the repository:**
    ```bash
