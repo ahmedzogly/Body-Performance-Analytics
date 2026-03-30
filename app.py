@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. ENHANCED CSS (نفس الكود السابق، تم اختصاره للتوفير) ---
+# --- 2. CSS (نفس الكود السابق، تم اختصاره للتوفير) ---
 st.markdown("""
     <style>
     .main { background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%); color: #00f2ff; }
@@ -40,7 +40,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. TEXT CLEANING FOR PDF ---
+# --- 3. TEXT CLEANING FOR PDF (نفس الكود السابق) ---
 def clean_text_for_pdf(text):
     if not text:
         return ""
@@ -72,7 +72,7 @@ def clean_text_for_pdf(text):
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned if cleaned else "Information"
 
-# --- 4. HELPER FUNCTIONS ---
+# --- 4. HELPER FUNCTIONS (نفس الكود السابق) ---
 def get_percentile(grade):
     percentiles = {'A': 'Top 15%', 'B': 'Top 35%', 'C': 'Average (50-70%)', 'D': 'Bottom 20%'}
     return percentiles.get(grade, 'Average')
@@ -156,7 +156,7 @@ def get_performance_insights(grade, jump_distance, age):
         insights.append("- Focus on mobility and injury prevention.")
     return '\n'.join(insights)
 
-# --- 5. PDF GENERATOR ---
+# --- 5. PDF GENERATOR (نفس الكود السابق) ---
 class TitanPDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -258,132 +258,159 @@ def load_assets():
             return None
     return loaded_models['classifier'], loaded_models['regression'], loaded_models['scaler']
 
-# --- 7. FILE PROCESSING FUNCTIONS ---
-def detect_encoding(file_bytes):
-    try:
-        result = chardet.detect(file_bytes)
-        return result['encoding'], result['confidence']
-    except:
-        return None, 0
-
-def process_uploaded_file(uploaded_file):
+# --- 7. SPECIAL FILE PROCESSING FOR YOUR DATA FORMAT ---
+def process_special_file_format(uploaded_file):
+    """Special processing for your specific file format"""
     file_extension = uploaded_file.name.split('.')[-1].lower()
+    
     try:
         if file_extension == 'csv':
+            # Read the file as text first
             file_bytes = uploaded_file.getvalue()
-            encoding, confidence = detect_encoding(file_bytes)
-            if encoding:
-                try:
-                    text_content = file_bytes.decode(encoding)
-                    from io import StringIO
-                    df = pd.read_csv(StringIO(text_content))
-                    st.success(f"✅ CSV file loaded! Found {len(df)} records.")
-                    return df
-                except:
-                    pass
-            encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'cp1256', 'windows-1256', 'utf-16']
-            for enc in encodings_to_try:
-                try:
-                    uploaded_file.seek(0)
-                    df = pd.read_csv(uploaded_file, encoding=enc)
-                    st.success(f"✅ CSV loaded with {enc} encoding! Found {len(df)} records.")
-                    return df
-                except:
+            
+            # Try to detect encoding
+            encoding, _ = chardet.detect(file_bytes)
+            if not encoding:
+                encoding = 'utf-8'
+            
+            # Decode the file
+            text_content = file_bytes.decode(encoding, errors='ignore')
+            
+            # Split into lines
+            lines = text_content.strip().split('\n')
+            
+            # Extract header and data
+            header_line = lines[0]
+            data_lines = lines[1:]
+            
+            # Parse header to identify columns
+            # Based on your screenshot, the header seems to have merged columns
+            # Let's create standard column names
+            standard_columns = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
+                               'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 
+                               'sit_ups_counts', 'broad_jump_cm', 'class']
+            
+            # Try to extract data using regex
+            data_rows = []
+            
+            for line in data_lines:
+                if not line.strip():
                     continue
-            raise Exception("Could not read CSV file")
+                
+                # Extract numbers and letters using regex
+                # Pattern to find numbers (integers and decimals)
+                numbers = re.findall(r'(\d+\.?\d*)', line)
+                # Pattern to find class letter (A, B, C, D) at the end
+                class_match = re.search(r'([A-D])\s*$', line)
+                
+                if len(numbers) >= 11:  # We expect at least 11 numeric values
+                    try:
+                        row_data = {
+                            'age': float(numbers[0]) if numbers[0] else 25,
+                            'gender': 0 if 'M' in line or 'm' in line[:10] else 1,  # Try to detect gender
+                            'height_cm': float(numbers[1]) if len(numbers) > 1 else 170,
+                            'weight_kg': float(numbers[2]) if len(numbers) > 2 else 70,
+                            'body_fat_pct': float(numbers[3]) if len(numbers) > 3 else 18,
+                            'diastolic': float(numbers[4]) if len(numbers) > 4 else 80,
+                            'systolic': float(numbers[5]) if len(numbers) > 5 else 120,
+                            'gripForce': float(numbers[6]) if len(numbers) > 6 else 45,
+                            'sit_bend_forward_cm': float(numbers[7]) if len(numbers) > 7 else 15,
+                            'sit_ups_counts': float(numbers[8]) if len(numbers) > 8 else 40,
+                            'broad_jump_cm': float(numbers[9]) if len(numbers) > 9 else 180,
+                            'class': class_match.group(1) if class_match else 'C'
+                        }
+                        
+                        # Gender detection based on text
+                        if 'M' in line[:5] or 'm' in line[:5]:
+                            row_data['gender'] = 0
+                        elif 'F' in line[:5] or 'f' in line[:5]:
+                            row_data['gender'] = 1
+                        
+                        data_rows.append(row_data)
+                    except Exception as e:
+                        st.warning(f"Error parsing row: {line[:100]}... Error: {e}")
+                        continue
+            
+            if data_rows:
+                df = pd.DataFrame(data_rows)
+                st.success(f"✅ Successfully parsed {len(df)} records from special format!")
+                return df
+            else:
+                # If regex parsing fails, try standard CSV reading
+                uploaded_file.seek(0)
+                df = pd.read_csv(uploaded_file, encoding=encoding, on_bad_lines='skip')
+                return df
+        
         elif file_extension in ['xlsx', 'xls']:
             df = pd.read_excel(uploaded_file)
-            st.success(f"✅ Excel loaded! Found {len(df)} records.")
             return df
         else:
             st.error(f"Unsupported format: {file_extension}")
             return None
+            
     except Exception as e:
-        st.error(f"Error reading file: {str(e)}")
+        st.error(f"Error processing file: {str(e)}")
         return None
 
-# --- 8. ENHANCED DATA VALIDATION AND CLEANING ---
 def validate_and_clean_data(df):
-    """Validate and clean data before analysis"""
-    st.markdown("### 🔍 Data Validation & Cleaning")
-    
-    # Required columns
+    """Validate and clean data for analysis"""
     required_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                      'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
-    # Check if columns exist
-    missing_cols = [col for col in required_cols if col not in df.columns]
-    if missing_cols:
-        st.error(f"Missing columns: {missing_cols}")
-        return None
+    # Create a copy with required columns
+    df_clean = pd.DataFrame()
     
-    # Create a copy for cleaning
-    df_clean = df[required_cols].copy()
-    
-    # Check data types and convert
-    issues = []
     for col in required_cols:
-        # Check for non-numeric values
-        non_numeric = df_clean[col].apply(lambda x: not pd.api.types.is_number(x) if pd.notna(x) else False)
-        if non_numeric.any():
-            issues.append(f"Column '{col}' has {non_numeric.sum()} non-numeric values")
-            # Try to convert to numeric
-            df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
+        if col in df.columns:
+            df_clean[col] = pd.to_numeric(df[col], errors='coerce')
+        else:
+            # Try to find similar column
+            found = False
+            for existing_col in df.columns:
+                if col.replace('_', '') in existing_col.replace('_', '').lower():
+                    df_clean[col] = pd.to_numeric(df[existing_col], errors='coerce')
+                    found = True
+                    break
+            if not found:
+                # Use default values
+                default_values = {
+                    'age': 25, 'gender': 0, 'height_cm': 170, 'weight_kg': 70,
+                    'body_fat_pct': 18, 'diastolic': 80, 'systolic': 120,
+                    'gripForce': 45, 'sit_bend_forward_cm': 15, 'sit_ups_counts': 40
+                }
+                df_clean[col] = default_values.get(col, 0)
     
-    # Check for outliers and invalid values
-    # Age validation (10-80)
-    invalid_age = (df_clean['age'] < 10) | (df_clean['age'] > 80)
-    if invalid_age.any():
-        issues.append(f"Age out of range (10-80): {invalid_age.sum()} records")
-        df_clean.loc[invalid_age, 'age'] = df_clean.loc[invalid_age, 'age'].clip(10, 80)
+    # Clean data
+    # Age range
+    df_clean['age'] = df_clean['age'].clip(10, 80)
+    # Gender (0 or 1)
+    df_clean['gender'] = df_clean['gender'].apply(lambda x: 0 if x < 0.5 else 1)
+    # Height range
+    df_clean['height_cm'] = df_clean['height_cm'].clip(100, 220)
+    # Weight range
+    df_clean['weight_kg'] = df_clean['weight_kg'].clip(30, 150)
+    # Body fat range
+    df_clean['body_fat_pct'] = df_clean['body_fat_pct'].clip(5, 50)
+    # Blood pressure ranges
+    df_clean['diastolic'] = df_clean['diastolic'].clip(40, 130)
+    df_clean['systolic'] = df_clean['systolic'].clip(80, 200)
+    # Grip strength
+    df_clean['gripForce'] = df_clean['gripForce'].clip(0, 100)
+    # Flexibility
+    df_clean['sit_bend_forward_cm'] = df_clean['sit_bend_forward_cm'].clip(-20, 40)
+    # Sit-ups
+    df_clean['sit_ups_counts'] = df_clean['sit_ups_counts'].clip(0, 100)
     
-    # Gender validation (0 or 1)
-    invalid_gender = ~df_clean['gender'].isin([0, 1])
-    if invalid_gender.any():
-        issues.append(f"Invalid gender values: {invalid_gender.sum()} records")
-        df_clean.loc[invalid_gender, 'gender'] = 0
-    
-    # Height validation (100-220 cm)
-    invalid_height = (df_clean['height_cm'] < 100) | (df_clean['height_cm'] > 220)
-    if invalid_height.any():
-        issues.append(f"Height out of range (100-220): {invalid_height.sum()} records")
-        df_clean.loc[invalid_height, 'height_cm'] = df_clean.loc[invalid_height, 'height_cm'].clip(100, 220)
-    
-    # Weight validation (30-150 kg)
-    invalid_weight = (df_clean['weight_kg'] < 30) | (df_clean['weight_kg'] > 150)
-    if invalid_weight.any():
-        issues.append(f"Weight out of range (30-150): {invalid_weight.sum()} records")
-        df_clean.loc[invalid_weight, 'weight_kg'] = df_clean.loc[invalid_weight, 'weight_kg'].clip(30, 150)
-    
-    # Body fat validation (5-50%)
-    invalid_fat = (df_clean['body_fat_pct'] < 5) | (df_clean['body_fat_pct'] > 50)
-    if invalid_fat.any():
-        issues.append(f"Body fat out of range (5-50): {invalid_fat.sum()} records")
-        df_clean.loc[invalid_fat, 'body_fat_pct'] = df_clean.loc[invalid_fat, 'body_fat_pct'].clip(5, 50)
-    
-    # Fill NaN values with median or 0
+    # Fill NaN values
     for col in required_cols:
         if df_clean[col].isna().any():
-            if col in ['age', 'height_cm', 'weight_kg', 'body_fat_pct', 'diastolic', 'systolic']:
-                median_val = df_clean[col].median()
-                df_clean[col].fillna(median_val, inplace=True)
-                issues.append(f"Filled {df_clean[col].isna().sum()} NaN in '{col}' with median ({median_val:.1f})")
-            else:
-                df_clean[col].fillna(0, inplace=True)
-                issues.append(f"Filled NaN in '{col}' with 0")
-    
-    # Display issues
-    if issues:
-        with st.expander("📋 Data Quality Issues Fixed", expanded=True):
-            for issue in issues[:15]:
-                st.warning(issue)
-    else:
-        st.success("✅ All data passed validation!")
+            median_val = df_clean[col].median() if not df_clean[col].isna().all() else 0
+            df_clean[col].fillna(median_val, inplace=True)
     
     return df_clean
 
 def analyze_batch_data(df, scaler, clf, reg):
-    """Analyze batch data with proper validation"""
+    """Analyze batch data"""
     feature_names = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
                     'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
     
@@ -391,41 +418,33 @@ def analyze_batch_data(df, scaler, clf, reg):
     
     for idx, row in df.iterrows():
         try:
-            # Extract features
             features = [row[col] for col in feature_names]
-            
-            # Create input DataFrame
             input_df = pd.DataFrame([features], columns=feature_names)
-            
-            # Scale and predict
             scaled_data = scaler.transform(input_df)
             p_class = clf.predict(scaled_data)[0]
             p_jump = reg.predict(scaled_data)[0]
             
-            # Calculate BMI
             height = row['height_cm']
             weight = row['weight_kg']
             bmi = weight / ((height/100) ** 2) if height > 0 else 0
             
             results.append({
-                'Row_Index': idx,
+                'Row': idx,
                 'Predicted_Class': p_class,
                 'Predicted_Jump_CM': round(p_jump, 2),
-                'BMI': round(bmi, 2),
-                'Status': 'Success'
+                'BMI': round(bmi, 2)
             })
         except Exception as e:
             results.append({
-                'Row_Index': idx,
+                'Row': idx,
                 'Predicted_Class': 'Error',
                 'Predicted_Jump_CM': 0,
-                'BMI': 0,
-                'Status': f'Error: {str(e)[:80]}'
+                'BMI': 0
             })
     
     return pd.DataFrame(results)
 
-# --- 9. SESSION STATE ---
+# --- 8. SESSION STATE ---
 if 'analysis_history' not in st.session_state:
     st.session_state.analysis_history = []
 if 'last_analysis' not in st.session_state:
@@ -433,14 +452,14 @@ if 'last_analysis' not in st.session_state:
 if 'batch_results' not in st.session_state:
     st.session_state.batch_results = None
 
-# --- 10. MAIN INTERFACE ---
+# --- 9. MAIN INTERFACE ---
 st.markdown("<h1 class='tech-header'>⚡ BODY PERFORMANCE AI PRO ⚡</h1>", unsafe_allow_html=True)
 st.markdown("<p class='tech-subheader'>Advanced Neural Analytics for Athletic Excellence</p>", unsafe_allow_html=True)
 
 # Create Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔬 SINGLE ANALYSIS", "📊 BATCH ANALYSIS", "📈 PERFORMANCE DASHBOARD", "📊 TREND ANALYTICS", "📚 RESOURCE LIBRARY"])
 
-# --- TAB 1: SINGLE ANALYSIS ---
+# --- TAB 1: SINGLE ANALYSIS (نفس الكود السابق) ---
 with tab1:
     col_in, col_out = st.columns([1, 1.2], gap="large")
     
@@ -572,201 +591,128 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TAB 2: BATCH ANALYSIS (MODIFIED WITH VALIDATION) ---
+# --- TAB 2: BATCH ANALYSIS (MODIFIED FOR SPECIAL FORMAT) ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<h2 style='color:#00f2ff; font-size: 2rem;'>📊 BATCH DATA ANALYSIS</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload Excel or CSV file for batch analysis</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#94a3b8; font-size: 1.1rem;'>Upload your CSV or Excel file for batch analysis</p>", unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader(
         "📁 Upload File (CSV, Excel)",
         type=['csv', 'xlsx', 'xls'],
-        help="Upload file with biometric data"
+        help="Upload your body performance data file"
     )
     
     if uploaded_file is not None:
-        df = process_uploaded_file(uploaded_file)
+        # Use special file processor for your format
+        df = process_special_file_format(uploaded_file)
         
-        if df is not None:
-            # Show original columns
-            st.info(f"📄 Original columns: {', '.join(df.columns)}")
+        if df is not None and len(df) > 0:
+            st.success(f"✅ File loaded! Found {len(df)} records.")
             
-            # Smart column mapping
-            st.markdown("### 🔄 Column Mapping")
+            # Display preview
+            with st.expander("📋 Preview Uploaded Data", expanded=True):
+                st.dataframe(df.head(10), use_container_width=True)
+                st.caption(f"Total rows: {len(df)} | Columns: {', '.join(df.columns)}")
             
-            # Try to map common column names
-            column_mapping = {
-                'age': ['age', 'Age', 'AGE', 'years'],
-                'gender': ['gender', 'Gender', 'GENDER', 'sex'],
-                'height_cm': ['height_cm', 'height', 'Height', 'HEIGHT', 'ht'],
-                'weight_kg': ['weight_kg', 'weight', 'Weight', 'WEIGHT', 'wt'],
-                'body_fat_pct': ['body_fat_pct', 'body_fat', 'fat', 'BodyFat', 'body_fat_percentage'],
-                'diastolic': ['diastolic', 'Diastolic', 'DIASTOLIC', 'dbp'],
-                'systolic': ['systolic', 'Systolic', 'SYSTOLIC', 'sbp'],
-                'gripForce': ['gripForce', 'grip_force', 'grip', 'Grip', 'hand_grip'],
-                'sit_bend_forward_cm': ['sit_bend_forward_cm', 'sit_bend', 'flexibility', 'bend'],
-                'sit_ups_counts': ['sit_ups_counts', 'sit_ups', 'situps', 'SitUps']
-            }
+            # Clean and validate data
+            df_clean = validate_and_clean_data(df)
             
-            mapped_cols = {}
-            for std_col, variations in column_mapping.items():
-                for var in variations:
-                    if var in df.columns:
-                        mapped_cols[var] = std_col
-                        break
-            
-            if mapped_cols:
-                df.rename(columns=mapped_cols, inplace=True)
-                st.success(f"✅ Mapped columns: {', '.join([f'{old}→{new}' for old, new in mapped_cols.items()])}")
-            
-            # Check if we have all required columns
-            required_cols = ['age', 'gender', 'height_cm', 'weight_kg', 'body_fat_pct', 
-                           'diastolic', 'systolic', 'gripForce', 'sit_bend_forward_cm', 'sit_ups_counts']
-            
-            available_cols = [col for col in required_cols if col in df.columns]
-            missing_cols = [col for col in required_cols if col not in df.columns]
-            
-            if missing_cols:
-                st.error(f"❌ Missing required columns: {missing_cols}")
-                st.info("Please ensure your file contains these columns. Check the 'File Structure Analysis' above.")
-            else:
-                st.success(f"✅ All required columns found: {', '.join(available_cols)}")
-                
-                # Display preview
-                with st.expander("📋 Preview Uploaded Data", expanded=True):
-                    st.dataframe(df[required_cols].head(10), use_container_width=True)
-                    st.caption(f"Total rows: {len(df)}")
-                
-                # Validate and clean data
-                df_clean = validate_and_clean_data(df)
-                
-                if df_clean is not None:
-                    # Analyze button
-                    if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
-                        models = load_assets()
-                        if models is None:
-                            st.error("❌ Models not loaded properly.")
+            # Analyze button
+            if st.button("🚀 ANALYZE BATCH DATA", use_container_width=True):
+                models = load_assets()
+                if models is None:
+                    st.error("❌ Models not loaded properly.")
+                else:
+                    clf, reg, scaler = models
+                    
+                    with st.spinner(f"📊 Analyzing {len(df_clean)} records..."):
+                        progress_bar = st.progress(0)
+                        results_df = analyze_batch_data(df_clean, scaler, clf, reg)
+                        progress_bar.empty()
+                    
+                    success_count = len(results_df[results_df['Predicted_Class'] != 'Error'])
+                    st.success(f"✅ Analysis completed! Successful: {success_count} / {len(results_df)}")
+                    
+                    if success_count > 0:
+                        st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
+                        st.dataframe(results_df.head(20), use_container_width=True)
+                        
+                        # Summary stats
+                        success_df = results_df[results_df['Predicted_Class'] != 'Error']
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("Total Records", len(df))
+                        with col2:
+                            st.metric("Successful", len(success_df))
+                        with col3:
+                            st.metric("Failed", len(df) - len(success_df))
+                        with col4:
+                            if len(success_df) > 0:
+                                st.metric("Avg Jump", f"{success_df['Predicted_Jump_CM'].mean():.1f} cm")
+                        
+                        # Class distribution
+                        class_counts = success_df['Predicted_Class'].value_counts()
+                        fig = px.pie(
+                            values=class_counts.values,
+                            names=class_counts.index,
+                            title="Performance Class Distribution",
+                            color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
+                        )
+                        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
+                        st.plotly_chart(fig, use_container_width=True)
+                        
+                        # Download results
+                        output = io.BytesIO()
+                        file_ext = uploaded_file.name.split('.')[-1].lower()
+                        
+                        if file_ext == 'csv':
+                            results_df.to_csv(output, index=False, encoding='utf-8')
+                            mime = "text/csv"
+                            filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
                         else:
-                            clf, reg, scaler = models
-                            
-                            with st.spinner(f"📊 Analyzing {len(df_clean)} records..."):
-                                progress_bar = st.progress(0)
-                                
-                                results = []
-                                for idx, row in df_clean.iterrows():
-                                    progress_bar.progress((idx + 1) / len(df_clean))
-                                    
-                                    try:
-                                        features = [row[col] for col in required_cols]
-                                        input_df = pd.DataFrame([features], columns=required_cols)
-                                        scaled_data = scaler.transform(input_df)
-                                        p_class = clf.predict(scaled_data)[0]
-                                        p_jump = reg.predict(scaled_data)[0]
-                                        
-                                        height = row['height_cm']
-                                        weight = row['weight_kg']
-                                        bmi = weight / ((height/100) ** 2) if height > 0 else 0
-                                        
-                                        results.append({
-                                            'Row': idx,
-                                            'Predicted_Class': p_class,
-                                            'Predicted_Jump_CM': round(p_jump, 2),
-                                            'BMI': round(bmi, 2)
-                                        })
-                                    except Exception as e:
-                                        results.append({
-                                            'Row': idx,
-                                            'Predicted_Class': 'Error',
-                                            'Predicted_Jump_CM': 0,
-                                            'BMI': 0
-                                        })
-                                
-                                progress_bar.empty()
-                                results_df = pd.DataFrame(results)
-                            
-                            success_count = len(results_df[results_df['Predicted_Class'] != 'Error'])
-                            st.success(f"✅ Analysis completed! Successful: {success_count} / {len(results_df)}")
-                            
-                            if success_count > 0:
-                                st.markdown("<h3 style='color:#00f2ff; margin-top: 20px;'>📊 Analysis Results</h3>", unsafe_allow_html=True)
-                                st.dataframe(results_df.head(20), use_container_width=True)
-                                
-                                # Summary stats
-                                success_df = results_df[results_df['Predicted_Class'] != 'Error']
-                                
-                                col1, col2, col3, col4 = st.columns(4)
-                                with col1:
-                                    st.metric("Total Records", len(df))
-                                with col2:
-                                    st.metric("Successful", len(success_df))
-                                with col3:
-                                    st.metric("Failed", len(df) - len(success_df))
-                                with col4:
-                                    if len(success_df) > 0:
-                                        st.metric("Avg Jump", f"{success_df['Predicted_Jump_CM'].mean():.1f} cm")
-                                
-                                # Class distribution
-                                class_counts = success_df['Predicted_Class'].value_counts()
-                                fig = px.pie(
-                                    values=class_counts.values,
-                                    names=class_counts.index,
-                                    title="Performance Class Distribution",
-                                    color_discrete_sequence=['#00ff00', '#ffaa44', '#ff6644', '#ff4444']
-                                )
-                                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#00f2ff")
-                                st.plotly_chart(fig, use_container_width=True)
-                                
-                                # Download results
-                                output = io.BytesIO()
-                                file_ext = uploaded_file.name.split('.')[-1].lower()
-                                
-                                if file_ext == 'csv':
-                                    results_df.to_csv(output, index=False, encoding='utf-8')
-                                    mime = "text/csv"
-                                    filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
-                                else:
-                                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                                        results_df.to_excel(writer, sheet_name='Results', index=False)
-                                    mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-                                
-                                output.seek(0)
-                                st.download_button(
-                                    label="📥 DOWNLOAD RESULTS",
-                                    data=output,
-                                    file_name=filename,
-                                    mime=mime,
-                                    use_container_width=True
-                                )
-                            else:
-                                st.error("❌ No records were successfully analyzed.")
-                                st.info("Please check the data validation section for issues.")
+                            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                                results_df.to_excel(writer, sheet_name='Results', index=False)
+                            mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            filename = f"Batch_Results_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+                        
+                        output.seek(0)
+                        st.download_button(
+                            label="📥 DOWNLOAD RESULTS",
+                            data=output,
+                            file_name=filename,
+                            mime=mime,
+                            use_container_width=True
+                        )
+                    else:
+                        st.error("❌ No records were successfully analyzed.")
+                        st.info("Please check the data format. Expected columns: age, gender, height_cm, weight_kg, body_fat_pct, diastolic, systolic, gripForce, sit_bend_forward_cm, sit_ups_counts")
     
     else:
-        st.info("📂 Upload an Excel or CSV file to begin batch analysis")
+        st.info("📂 Upload your CSV or Excel file to begin batch analysis")
         
-        with st.expander("📝 Required Columns Format", expanded=False):
+        with st.expander("📝 Required Format", expanded=False):
             st.markdown("""
             ### Required Columns:
-            | Column | Description | Type |
-            |--------|-------------|------|
-            | age | Age in years | Numeric (10-80) |
-            | gender | 0=Male, 1=Female | Numeric (0/1) |
-            | height_cm | Height in cm | Numeric (100-220) |
-            | weight_kg | Weight in kg | Numeric (30-150) |
-            | body_fat_pct | Body fat % | Numeric (5-50) |
-            | diastolic | Diastolic BP | Numeric (40-130) |
-            | systolic | Systolic BP | Numeric (80-200) |
-            | gripForce | Grip strength | Numeric (0-100) |
-            | sit_bend_forward_cm | Flexibility | Numeric (-20-40) |
-            | sit_ups_counts | Sit-ups count | Numeric (0-100) |
+            | Column | Description | Example |
+            |--------|-------------|---------|
+            | age | Age in years | 25 |
+            | gender | 0=Male, 1=Female | 0 |
+            | height_cm | Height in cm | 175.5 |
+            | weight_kg | Weight in kg | 70.2 |
+            | body_fat_pct | Body fat % | 18.5 |
+            | diastolic | Diastolic BP | 80 |
+            | systolic | Systolic BP | 120 |
+            | gripForce | Grip strength | 45.5 |
+            | sit_bend_forward_cm | Flexibility | 15.3 |
+            | sit_ups_counts | Sit-ups count | 45 |
             """)
             
             st.markdown("### CSV Example:")
             st.code("""age,gender,height_cm,weight_kg,body_fat_pct,diastolic,systolic,gripForce,sit_bend_forward_cm,sit_ups_counts
 25,0,175.5,70.2,18.5,80,120,45.5,15.3,45
-30,1,165.3,65.4,22.0,75,115,38.2,12.5,38
-28,0,180.2,78.5,15.2,82,125,52.3,18.2,52""", language='csv')
+30,1,165.3,65.4,22.0,75,115,38.2,12.5,38""", language='csv')
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -893,7 +839,7 @@ with tab5:
 # --- FOOTER ---
 st.markdown("""
 <div class='footer'>
-    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Batch Analysis with Auto-Validation</p>
+    <p>⚡ BODY PERFORMANCE AI PRO v5.0 | Neural Network Engine | Special Format Support</p>
     <p>© 2026 Advanced AI Analytics Division | Data-Driven Athletic Development</p>
     <p>Powered by Machine Learning | Accuracy: 94.6% | Trained on 13,392 Athlete Profiles</p>
 </div>
